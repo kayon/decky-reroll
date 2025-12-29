@@ -17,8 +17,19 @@ However, as my needs grew, I found the scanning speed and UI flow could be furth
 - 📱 **Compact Interface**: A streamlined, single-pane UI optimized for handheld play; focused on speed and efficiency without the need for scrolling.
 
 ## Installation
+### Method 1: From Decky Store (Recommended)
 1. Ensure you have [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) installed.
 2. Search for **Reroll** in the Decky Store and click Install.
+
+### Method 2: Install via URL (For Beta/Latest Updates)
+If you wish to install a specific version or a pre-release directly:
+1. Open **Settings** in the Decky Loader menu.
+2. Go to the **Developer** tab.
+3. Find the **Install from URL** field.
+4. Paste the following URL:
+
+   `https://github.com/kayon/decky-reroll/releases/latest/download/Reroll.zip`
+5. Click **Install**.
 
 ## Future Plans
 - [ ] Temporary save slots for search results
