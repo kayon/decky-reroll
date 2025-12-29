@@ -1,11 +1,11 @@
 {
   "name": "Reroll",
   "author": "Kayon",
-  "flags": ["debug"],
+  "flags": [""],
   "api_version": 1,
   "publish": {
     "tags": ["cheat", "memory"],
-    "description": "A simple and fast memory scanning plugin.",
-    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
+    "description": "A high-performance memory scanning plugin for the Steam Deck.",
+    "image": "https://raw.githubusercontent.com/kayon/decky-reroll/refs/heads/main/image/readme/ScreenShot.png"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "decky-reroll",
   "version": "0.1.0",
-  "description": "A simple memory search and modification tool.",
+  "description": "A high-performance memory scanning plugin for the Steam Deck.",
   "type": "module",
   "scripts": {
     "build": "rollup -c",

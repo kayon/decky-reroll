@@ -1,4 +1,4 @@
-export const log = (name: string, ...args: any[]) => {
+export const log = (name: string, ...args: unknown[]) => {
   console.log(
     `%c Reroll %c ${name} %c`,
     'background: #08667e; color: black;',
@@ -8,7 +8,7 @@ export const log = (name: string, ...args: any[]) => {
   )
 }
 
-export const debug = (name: string, ...args: any[]) => {
+export const debug = (name: string, ...args: unknown[]) => {
   console.debug(
     `%c Reroll %c ${name} %c`,
     'background: #08667e; color: black;',
@@ -18,7 +18,7 @@ export const debug = (name: string, ...args: any[]) => {
   )
 }
 
-export const warn = (name: string, ...args: any[]) => {
+export const warn = (name: string, ...args: unknown[]) => {
   console.warn(
     `%c Reroll %c ${name} %c`,
     'background: #08667e; color: black;',
@@ -28,7 +28,7 @@ export const warn = (name: string, ...args: any[]) => {
   )
 }
 
-export const error = (name: string, ...args: any[]) => {
+export const error = (name: string, ...args: unknown[]) => {
   console.error(
     `%c Reroll %c ${name} %c`,
     'background: #08667e; color: black;',
@@ -39,19 +39,19 @@ export const error = (name: string, ...args: any[]) => {
 }
 
 class Logger {
-  static log(name: string, ...args: any[]) {
+  static log(name: string, ...args: unknown[]) {
     log(name, ...args)
   }
 
-  static debug(name: string, ...args: any[]) {
+  static debug(name: string, ...args: unknown[]) {
     debug(name, ...args)
   }
 
-  static warn(name: string, ...args: any[]) {
+  static warn(name: string, ...args: unknown[]) {
     warn(name, ...args)
   }
 
-  static error(name: string, ...args: any[]) {
+  static error(name: string, ...args: unknown[]) {
     error(name, ...args)
   }
 }
