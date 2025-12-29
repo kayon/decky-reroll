@@ -3,25 +3,17 @@ set -e
 
 echo "Container's IP address: `awk 'END{print $1}' /etc/hosts`"
 
-BACKEND_REPO="github.com/kayon/memscan"
-BACKEND_VERSION="v0.2.1"
+BACKEND_VERSION="v0.2.2"
 BACKEND_SHARED="memscan.so"
+RELEASE_URL="https://github.com/kayon/memscan/releases/download/$BACKEND_VERSION/$BACKEND_SHARED"
 
-export GO111MODULE=on
-export CGO_ENABLED=1
-
-mkdir -p /tmp/build_workspace && cd /tmp/build_workspace
-go mod init build_context
-go get "${BACKEND_REPO}@${BACKEND_VERSION}"
-SOURCE_DIR=$(go list -m -f '{{.Dir}}' "${BACKEND_REPO}@${BACKEND_VERSION}")
-
-if [ -z "$SOURCE_DIR" ]; then
-    echo "Error: Failed to locate source for ${BACKEND_VERSION}"
+mkdir -p /backend/out
+echo "Downloading backend binary..."
+curl -L -o "./backend/out/$BACKEND_SHARED" "$RELEASE_URL"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to download binary from GitHub."
     exit 1
 fi
 
-cd "$SOURCE_DIR/cmd/backend"
-chmod -R +w .
-make
-mkdir -p /backend/out
-cp $BACKEND_SHARED /backend/out
+chmod +x "/backend/out/$BACKEND_SHARED"
+

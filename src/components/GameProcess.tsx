@@ -6,7 +6,6 @@ import Trans from '@/lib/i18n'
 import showQRCodeModal from '@/lib/ShowQRCodeModal'
 import { InternalRouting } from '@/classes'
 import { Process } from '@/classes'
-import { GamepadButton } from '@decky/ui/dist/components/FooterLegend'
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from 'react-icons/ri'
 
 const ProcessItem = memo(
@@ -37,12 +36,6 @@ const ProcessItem = memo(
         onGamepadBlur={onBlur}
         onOKButton={onSelect}
         onCancelButton={onCancel}
-        actionDescriptionMap={{
-          [GamepadButton.DIR_UP]: Trans('ACTION_MOVE', 'Move'),
-          [GamepadButton.DIR_DOWN]: Trans('ACTION_MOVE', 'Move'),
-          // OK = A
-          [GamepadButton.OK]: Trans('ACTION_CHANGE_VALUE', 'Change'),
-        }}
       >
         <div className="cursor left">
           <RiArrowDropRightLine />
