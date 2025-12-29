@@ -1,0 +1,32 @@
+{
+  "ACTION_INCREASE": "增加",
+  "ACTION_DECREASE": "減少",
+  "ACTION_MOVE": "移動",
+  "ACTION_PREV_PAGE": "上頁",
+  "ACTION_NEXT_PAGE": "下頁",
+  "ACTION_RESET": "重置",
+  "ACTION_DIGIT_MIN": "最小",
+  "ACTION_DIGIT_MAX": "最大",
+  "ACTION_BACK": "返回",
+  "ACTION_EDIT": "編輯",
+  "ACTION_CHANGE_VALUE": "更改此值",
+  "ACTION_CHANGE_ALL_VALUES": "更改全部",
+
+  "GAME_INACTIVE": "遊戲未啟動",
+  "FIRST_SCAN": "新的掃描",
+  "NEXT_SCAN": "再次掃描",
+  "RESET_SCAN": "重置",
+  "FOUND": "找到",
+
+  "SETTINGS": "設定",
+  "RESET_DEFAULT": "恢復默認設置",
+  "RESULTS_THRESHOLD": "結果顯示閾值",
+  "SCAN_OPTION_FLOAT": "浮點數選項",
+  "SCAN_OPTION_FLOAT_UNROUNDED": "快速",
+  "SCAN_OPTION_FLOAT_ROUNDED": "捨入 (四捨五入)",
+  "SCAN_OPTION_FLOAT_EXTREME": "捨入 (取極值)",
+  "SCAN_OPTION_FLOAT_TRUNCATED": "截斷",
+
+  "WRONG_PROCESS": "錯誤的程序？",
+  "REPORT_ISSUE": "回報問題"
+}

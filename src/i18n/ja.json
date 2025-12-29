@@ -1,0 +1,32 @@
+{
+  "ACTION_INCREASE": "増やす",
+  "ACTION_DECREASE": "減らす",
+  "ACTION_MOVE": "移動",
+  "ACTION_PREV_PAGE": "前へ",
+  "ACTION_NEXT_PAGE": "次へ",
+  "ACTION_RESET": "リセット",
+  "ACTION_DIGIT_MIN": "最小",
+  "ACTION_DIGIT_MAX": "最大",
+  "ACTION_BACK": "戻る",
+  "ACTION_EDIT": "編集",
+  "ACTION_CHANGE_VALUE": "値を変更",
+  "ACTION_CHANGE_ALL_VALUES": "全て変更",
+
+  "GAME_INACTIVE": "ゲーム未起動",
+  "FIRST_SCAN": "新規スキャン",
+  "NEXT_SCAN": "次をスキャン",
+  "RESET_SCAN": "リセット",
+  "FOUND": "検索結果",
+
+  "SETTINGS": "設定",
+  "RESET_DEFAULT": "初期設定に戻す",
+  "RESULTS_THRESHOLD": "結果表示しきい値",
+  "SCAN_OPTION_FLOAT": "浮動小数点数オプション",
+  "SCAN_OPTION_FLOAT_UNROUNDED": "高速",
+  "SCAN_OPTION_FLOAT_ROUNDED": "丸め (四捨五入)",
+  "SCAN_OPTION_FLOAT_EXTREME": "丸め (端数処理)",
+  "SCAN_OPTION_FLOAT_TRUNCATED": "切り捨て",
+
+  "WRONG_PROCESS": "違うゲームですか？",
+  "REPORT_ISSUE": "問題を報告"
+}

@@ -1,0 +1,32 @@
+{
+  "ACTION_INCREASE": "增加",
+  "ACTION_DECREASE": "减少",
+  "ACTION_MOVE": "移动",
+  "ACTION_PREV_PAGE": "上页",
+  "ACTION_NEXT_PAGE": "下页",
+  "ACTION_RESET": "重置",
+  "ACTION_DIGIT_MIN": "最小",
+  "ACTION_DIGIT_MAX": "最大",
+  "ACTION_BACK": "返回",
+  "ACTION_EDIT": "编辑",
+  "ACTION_CHANGE_VALUE": "更改此值",
+  "ACTION_CHANGE_ALL_VALUES": "更改全部",
+
+  "GAME_INACTIVE": "游戏未启动",
+  "FIRST_SCAN": "新的扫描",
+  "NEXT_SCAN": "再次扫描",
+  "RESET_SCAN": "重置",
+  "FOUND": "找到",
+
+  "SETTINGS": "设置",
+  "RESET_DEFAULT": "恢复默认设置",
+  "RESULTS_THRESHOLD": "结果显示阈值",
+  "SCAN_OPTION_FLOAT": "浮点数选项",
+  "SCAN_OPTION_FLOAT_UNROUNDED": "快速",
+  "SCAN_OPTION_FLOAT_ROUNDED": "舍入 (四舍五入)",
+  "SCAN_OPTION_FLOAT_EXTREME": "舍入 (取极值)",
+  "SCAN_OPTION_FLOAT_TRUNCATED": "截断",
+
+  "WRONG_PROCESS": "错误的进程？",
+  "REPORT_ISSUE": "报告问题"
+}

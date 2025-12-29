@@ -1,0 +1,11 @@
+{
+  "name": "Reroll",
+  "author": "Kayon",
+  "flags": ["debug"],
+  "api_version": 1,
+  "publish": {
+    "tags": ["cheat", "memory"],
+    "description": "A simple and fast memory scanning plugin.",
+    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
+  }
+}
