@@ -4,6 +4,8 @@ A high-performance memory scanning plugin for the Steam Deck, inspired by [Memor
 
 ![ScreenShot](./image/readme/ScreenShot.png)
 
+![ScreenShot](./image/readme/DigitRoller.png)
+
 ## Why Reroll?
 I have been a long-time user of [Memory Deck](https://github.com/CameronRedmore/memory-deck)—it is a fantastic tool that has saved me countless hours.
 
