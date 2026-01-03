@@ -1,10 +1,10 @@
-import { JSX, useState, useSyncExternalStore } from 'react'
+import { JSX, useState } from 'react'
 import { Focusable, libraryAssetImageClasses, mainMenuAppRunningClasses, Marquee } from '@decky/ui'
 import { ResolveAppIconURL } from '@/lib/utils'
 import Trans from '@/lib/i18n'
 import { RiAlertFill } from 'react-icons/ri'
 import { AppGame, InternalRouting } from '@/classes'
-import { $store } from '@/store'
+import { $globalState, globalState } from '@/stores/global'
 
 interface GameSessionProps {
   game?: AppGame
@@ -12,7 +12,6 @@ interface GameSessionProps {
 }
 
 const GameSession = (props: GameSessionProps): JSX.Element => {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
   const [isHover, setIsHover] = useState(false)
 
   const renderIcon = () => {
@@ -52,20 +51,22 @@ const GameSession = (props: GameSessionProps): JSX.Element => {
   }
 
   const handleOkButton = () => {
-    if (!props.game && state.route === InternalRouting.Main) {
+    if (props.disabled) {
       return
     }
-    $store.navigation(
-      state.route === InternalRouting.Main ? InternalRouting.ProcessDetails : InternalRouting.Main
+    $globalState.navigation(
+      globalState.route === InternalRouting.Main
+        ? InternalRouting.ProcessDetails
+        : InternalRouting.Main
     )
   }
 
   // @ts-expect-error: supports returning false for bubbling despite void type definition
   const handleCancelButton = () => {
-    if (state.route === InternalRouting.Main) {
+    if (globalState.route === InternalRouting.Main) {
       return false
     }
-    $store.navigation(InternalRouting.Main)
+    $globalState.navigation(InternalRouting.Main)
   }
 
   const renderContent = () => {
@@ -127,30 +128,24 @@ const GameSession = (props: GameSessionProps): JSX.Element => {
   }
 
   return (
-    <>
-      {props.game && !props.disabled ? (
-        <Focusable
-          onGamepadFocus={() => {
-            setIsHover(true)
-          }}
-          onGamepadBlur={() => {
-            setIsHover(false)
-          }}
-          onOKButton={handleOkButton}
-          onClick={handleOkButton}
-          onCancelButton={handleCancelButton}
-          style={{
-            padding: 0,
-            height: '34px',
-          }}
-          noFocusRing
-        >
-          {renderContent()}
-        </Focusable>
-      ) : (
-        renderContent()
-      )}
-    </>
+    <Focusable
+      onGamepadFocus={() => {
+        setIsHover(true)
+      }}
+      onGamepadBlur={() => {
+        setIsHover(false)
+      }}
+      onOKButton={handleOkButton}
+      onClick={handleOkButton}
+      onCancelButton={handleCancelButton}
+      style={{
+        padding: 0,
+        height: '34px',
+      }}
+      noFocusRing
+    >
+      {renderContent()}
+    </Focusable>
   )
 }
 

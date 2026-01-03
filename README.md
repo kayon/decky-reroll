@@ -4,7 +4,7 @@ A high-performance memory scanning plugin for the Steam Deck, inspired by [Memor
 
 ![ScreenShot](./image/readme/ScreenShot.png)
 
-![ScreenShot](./image/readme/DigitRoller.png)
+![DigitRoller](./image/readme/DigitRoller.png)
 
 ## Why Reroll?
 I have been a long-time user of [Memory Deck](https://github.com/CameronRedmore/memory-deck)—it is a fantastic tool that has saved me countless hours.
@@ -15,6 +15,13 @@ However, as my needs grew, I found the scanning speed and UI flow could be furth
 - 🚀 **Ultra-Fast Scanning**: Millisecond-level scanning that delivers results before you can even blink, powered by [memscan](https://github.com/kayon/memscan), a high-performance engine custom-built for the Steam Deck.
 - 🎯 **Smart Process Identification**: Automatically detects the currently active game—eliminating the need to scroll through messy process lists or risk selecting the wrong target.
 - 📱 **Compact Interface**: A streamlined, single-pane UI optimized for handheld play; focused on speed and efficiency without the need for scrolling.
+
+## What's New
+### v0.2.0 (backend core: v0.3.0)
+This update introduces a major overhaul of the scanning engine, delivering significant performance gains and new features:
+* **NextScan Optimization**: Refactored the scanning algorithm. For datasets exceeding 10 million results, `NextScan` latency has been reduced from seconds to milliseconds.
+* **Ordered Results**: Search results are now displayed in ascending order.
+* **Undo Support**: Added Undo Scan functionality to revert the previous scan operation.
 
 ## Installation
 ### Method 1: From Decky Store (Recommended)
@@ -31,10 +38,32 @@ If you wish to install a specific version or a pre-release directly:
    `https://github.com/kayon/decky-reroll/releases/latest/download/Reroll.zip`
 5. Click **Install**.
 
+## Why does this plugin require root privileges?
+`Proton` games usually do not require `root` privileges to access memory because `Proton` runs as the `deck` user.
+
+However, for native Linux games, `root` is mandatory.
+
+## 💡 No results? Try selecting the process manually
+
+**A quick tip on the Auto-Select logic:**
+
+If you find that your searches aren't returning any results, it’s likely because you opened Reroll and clicked the "Game Name" before the game was fully launched.
+
+In this case, the actual game process might not have been created yet. Reroll’s auto-select logic might "grab" the wrong thing (like a launcher or a splash screen script) instead. While most people don't click that fast, I found this edge case during testing.
+
+**The fix is easy:**
+I’ve kept the **Manual Selection** feature just for this reason. If you think the wrong process was picked:
+1. Click the "Game Name" again to open the process list panel.
+2. Manually select the **first item** in the list (usually, the first one is the real game).
+3. For the best experience, wait until you reach the game's **Main Menu** before you start searching!
+
+![DigitRoller](./image/readme/GameProcesses.png)
+
 ## Future Plans
+- [x] Undo scan
+- [ ] Support for negative value searching
 - [ ] Temporary save slots for search results
 - [ ] Value freezing (Locking)
-- [ ] Support for negative value searching
 
 ## Maintenance & Contribution
 As an individual developer, my time and energy are limited, so updates may not always be immediate. However, I am the primary user of this plugin myself. As long as I'm using it, the project will remain active as I fix bugs and implement new ideas within my capabilities.
@@ -52,4 +81,7 @@ If you find this plugin helpful and want to support its development, please cons
 ## License
 This project is licensed under the **GNU General Public License v3.0**.
 
-**Note on Backend:** This plugin utilizes [memscan](https://github.com/kayon/memscan) as its core scanning engine. Both the frontend and backend components are open-sourced under the GPL v3 license to ensure the technology remains free and transparent for the Steam Deck community. For more details, please refer to the [LICENSE](LICENSE) file.
+- **Core Engine:** This plugin utilizes [memscan](https://github.com/kayon/memscan) as its core scanning engine. Both the frontend and backend components are open-sourced under the GPL v3 license.
+- **Template & Scaffolding:** This project is derived from the [decky-plugin-template](https://github.com/SteamDeckHomebrew/decky-plugin-template), which is licensed under the **BSD 3-Clause License**.
+
+For full licensing details, including the mandatory BSD 3-Clause notices, please refer to the [LICENSE](LICENSE) file.

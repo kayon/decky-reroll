@@ -4,7 +4,7 @@ import {
   quickAccessMenuClasses,
 } from '@decky/ui'
 import { definePlugin } from '@decky/api'
-import React, { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { RiDiceFill } from 'react-icons/ri'
 import DigitRoller from './components/DigitRoller'
 import {
@@ -17,11 +17,11 @@ import {
   PlaySound,
   ValueTypeMap,
   ValueTypeOptions,
-} from './lib/utils'
-import Logger from './lib/Logger'
+} from '@/lib/utils'
+import Logger from '@/lib/Logger'
 import { AppLifetimeNotification } from '@decky/ui/src/globals/steam-client/GameSessions'
 import { Unregisterable } from '@decky/ui/src/globals/steam-client/shared'
-import { $settings, $store } from '@/store'
+import { $globalState, globalState } from '@/stores/global'
 import GameSession from '@/components/GameSession'
 import MainActions from '@/components/MainActions'
 import Backend from '@/lib/backend'
@@ -31,66 +31,65 @@ import SwitchButtons from '@/components/SwitchButtons'
 import PanelContainer from '@/components/PanelContainer'
 import GameProcess from '@/components/GameProcess'
 import Settings from '@/components/Settings'
+import { useSnapshot } from 'valtio'
+import { $settings, settings } from '@/stores/settings'
 
 function Content() {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
+  const globalStateSnap = useSnapshot(globalState)
 
   useEffect(() => {
-    $store.setGame(window.SteamUIStore.MainRunningApp)
+    $globalState.setGame(window.SteamUIStore.MainRunningApp)
   }, [])
 
   const FirstScannable = useMemo<boolean>(() => {
-    if (!state.game) {
+    if (!globalStateSnap.game) {
       return false
     }
-    if (state.scanValueError) {
+    if (globalStateSnap.scanValueError) {
       return false
     }
     // 在NextScan阶段, 但结果数不是0
-    if (state.results && state.results.Count !== 0) {
+    if (globalStateSnap.results && globalStateSnap.results.Count !== 0) {
       return false
     }
-    const num = Number(state.scanValue)
+    const num = Number(globalStateSnap.scanValue)
     // 首次扫描不能为0
     return !(isNaN(num) || num === 0)
-  }, [state.game, state.scanValueError, state.scanValue, state.results])
+  }, [
+    globalStateSnap.game,
+    globalStateSnap.scanValueError,
+    globalStateSnap.scanValue,
+    globalStateSnap.results,
+  ])
 
   const NextScannable = useMemo<boolean>(() => {
-    if (state.scanValueError) {
+    if (globalStateSnap.scanValueError) {
       return false
     }
-    return !!(state.results && state.results.Count > 0)
-  }, [state.results, state.scanValueError])
+    return !!(globalStateSnap.results && globalStateSnap.results.Count > 0)
+  }, [globalStateSnap.results, globalStateSnap.scanValueError])
+
+  const UndoScannable = useMemo<boolean>(() => {
+    return !!globalStateSnap.results && globalStateSnap.results.CanUndo
+  }, [globalStateSnap.results])
 
   const Resettable = useMemo<boolean>(() => {
     // 有任意结果后可重置
-    return !!state.results
-  }, [state.results])
+    return !!globalStateSnap.results
+  }, [globalStateSnap.results])
 
   const handleChangeScanType = (type: ValueTypes) => {
-    $store.setState({
-      scanType: type,
-      scanValue: '',
-      scanValueError: false,
-    })
+    $globalState.setScanType(type)
     PlaySound(ActionSoundEffects.ScanTypeChanged)
   }
 
-  const handleChangeScanValue = (value: string) => {
-    $store.setState({
-      scanValue: value,
-    })
-  }
-
   const handleCheckScanValue = () => {
-    if (!state.scanValue) {
+    if (!globalState.scanValue) {
       PlaySound(ActionSoundEffects.DigitRollerOut)
       return
     }
-    const invalid = !IsValueValid(state.scanValue, state.scanType)
-    $store.setState({
-      scanValueError: invalid,
-    })
+    const invalid = !IsValueValid(globalState.scanValue, globalState.scanType)
+    globalState.scanValueError = invalid
     if (invalid) {
       PlaySound(ActionSoundEffects.DigitRollerError)
     } else {
@@ -99,69 +98,69 @@ function Content() {
   }
 
   const handleFirstScan = async () => {
-    if (!state.game) {
+    if (!globalState.game) {
       return
     }
-    $store.setState({ loading: true })
+    globalState.loading = true
     const results = await Backend.FirstScan(
-      state.game.appid,
-      state.scanValue,
-      state.scanType,
-      $settings.ScanOption
+      globalState.game.appid,
+      globalState.scanValue,
+      globalState.scanType,
+      settings.ScanOption
     )
-    $store.setState({
-      loading: false,
-      results: results,
-    })
+    globalState.loading = false
+    $globalState.setResults(results)
     PlaySound(ActionSoundEffects.FirstScan)
     Logger.debug(
       'FirstScan',
-      `AppID:${state.game.appid}`,
-      state.scanValue,
-      ValueTypeMap.get(state.scanType),
+      `AppID:${globalState.game.appid}`,
+      globalState.scanValue,
+      ValueTypeMap.get(globalState.scanType),
       'Results:',
       results
     )
   }
 
   const handleNextScan = async () => {
-    if (!state.game || !state.results) {
+    if (!globalState.game || !globalState.results) {
       return
     }
-    $store.setState({ loading: true })
-    const results = await Backend.NextScan(state.scanValue)
-    $store.setState({
-      loading: false,
-      results: results,
-    })
+    globalState.loading = true
+    const results = await Backend.NextScan(globalState.scanValue)
+    globalState.loading = false
+    $globalState.setResults(results)
     PlaySound(ActionSoundEffects.NextScan)
-    Logger.debug('NextScan', state.scanValue, 'Results:', results)
+    Logger.debug('NextScan', globalState.scanValue, 'Results:', results)
+  }
+
+  const handleUndoScan = async () => {
+    globalState.loading = true
+    const results = await Backend.UndoScan()
+    globalState.loading = false
+    if (results !== null) {
+      $globalState.setResults(results)
+    }
+    PlaySound(ActionSoundEffects.NextScan)
+    Logger.debug('UndoScan', 'Results:', results)
   }
 
   const handleResetScan = async () => {
-    $store.setState({
-      scanValue: '',
-      scanValueError: false,
-      results: null,
-    })
-    await Backend.ResetScan()
+    $globalState.resetScan()
   }
 
   const handleChangeValues = async (value: string, ...indexes: number[]) => {
     const results = await Backend.ChangeValues(value, indexes)
-    $store.setState({
-      results: results,
-    })
+    $globalState.setResults(results)
     PlaySound(ActionSoundEffects.ChangeValues)
     Logger.debug('ChangeValues', 'Results:', results)
   }
 
   const handleRefreshValues = async () => {
-    if (state.loading) {
+    if (globalState.loading) {
       return
     }
     const results = await Backend.RefreshValues()
-    $store.updateResultsValues(results?.List ?? [])
+    $globalState.updateResultsValues(results?.List ?? [])
   }
 
   const renderMainPanel = () => {
@@ -171,26 +170,27 @@ function Content() {
           <PanelSectionRow>
             <SwitchButtons
               options={ValueTypeOptions}
-              selected={state.scanType}
+              selected={globalStateSnap.scanType}
               onSelect={handleChangeScanType}
-              disabled={state.loading}
+              disabled={globalStateSnap.loading}
               focusable
             />
           </PanelSectionRow>
         )}
         <PanelSectionRow>
           <DigitRoller
-            value={state.scanValue}
-            type={state.scanType}
-            onChange={handleChangeScanValue}
+            value={globalStateSnap.scanValue}
+            type={globalStateSnap.scanType}
+            onChange={$globalState.setScanValue}
             onEnter={() => {
-              $store.setState({ scanValueError: false })
+              globalState.scanValueError = false
               PlaySound(ActionSoundEffects.DigitRollerIn)
             }}
             onLeave={handleCheckScanValue}
-            isError={state.scanValueError}
-            disabled={state.loading}
+            isError={globalStateSnap.scanValueError}
+            disabled={globalStateSnap.loading}
             showType={NextScannable}
+            autoFocus
           />
         </PanelSectionRow>
 
@@ -198,25 +198,22 @@ function Content() {
           <MainActions
             firstScannable={FirstScannable}
             nextScannable={NextScannable}
+            undoScannable={UndoScannable}
             resettable={Resettable}
-            disabled={state.loading}
+            disabled={globalStateSnap.loading}
             onFirstScan={handleFirstScan}
             onNextScan={handleNextScan}
+            onUndoScan={handleUndoScan}
             onResetScan={handleResetScan}
           />
         </PanelSectionRow>
 
-        <ScanResults
-          data={state.results}
-          scanType={state.scanType}
-          onChangeValues={handleChangeValues}
-          onRefreshValues={handleRefreshValues}
-        />
+        <ScanResults onChangeValues={handleChangeValues} onRefreshValues={handleRefreshValues} />
       </>
     )
   }
 
-  if (state.route === InternalRouting.Settings) {
+  if (globalStateSnap.route === InternalRouting.Settings) {
     return <Settings />
   }
 
@@ -224,23 +221,26 @@ function Content() {
     <PanelContainer>
       <PanelSection>
         <PanelSectionRow>
-          <GameSession game={state.game} disabled={state.loading} />
+          <GameSession game={globalStateSnap.game} disabled={globalStateSnap.loading} />
         </PanelSectionRow>
 
-        {state.route === InternalRouting.Main && renderMainPanel()}
-        {state.route === InternalRouting.ProcessDetails && <GameProcess />}
+        {globalStateSnap.route === InternalRouting.Main && renderMainPanel()}
+        {globalStateSnap.route === InternalRouting.ProcessDetails && <GameProcess
+          game={globalStateSnap.game}
+          process={globalStateSnap.process}
+          isFullscreen={!globalStateSnap.footerLegendVisible}
+        />}
       </PanelSection>
     </PanelContainer>
   )
 }
 
 function TitleContent() {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
-  const [version, setVersion] = useState<string>('')
+  const globalStateSnap = useSnapshot(globalState)
 
   useEffect(() => {
     Backend.Version().then(v => {
-      setVersion(v)
+      globalState.version = v
       Logger.log('Core', `v${v}`)
     })
   }, [])
@@ -259,18 +259,8 @@ function TitleContent() {
         padding-bottom: 0 !important;
       }
       `}</style>
-      {state.loading ? <Loading /> : <RiDiceFill style={{ fontSize: '26px' }} />}
+      {globalStateSnap.loading ? <Loading /> : <RiDiceFill style={{ fontSize: '26px' }} />}
       <span>Reroll</span>
-      <span
-        style={{
-          marginLeft: 'auto',
-          fontSize: '12px',
-          color: '#FFFFFF3F',
-          fontWeight: 'normal',
-        }}
-      >
-        Core: v{version}
-      </span>
     </div>
   )
 }
@@ -279,8 +269,7 @@ export default definePlugin(() => {
   Logger.debug('Loaded')
 
   $settings.init().then(() => {
-    Logger.log('Settings', $settings.state())
-    Backend.SetRenderResultsThreshold($settings.ResultsThreshold)
+    Logger.log('Settings', settings)
   })
 
   const registry: Unregisterable[] = []
@@ -290,7 +279,7 @@ export default definePlugin(() => {
       (notification: AppLifetimeNotification) => {
         Logger.debug('AppLifetimeNotification', notification)
         if (!notification.bRunning) {
-          $store.setGame(undefined)
+          $globalState.setGame(undefined)
         }
       }
     )
@@ -308,7 +297,7 @@ export default definePlugin(() => {
         // 在 AppLifetimeNotifications 中不设置
         // 防止过早打开 GameProcess 选择了错误的进程
         if (requestedAction === 'CreatingProcess') {
-          $store.setGame(window.SteamUIStore.MainRunningApp)
+          $globalState.setGame(window.SteamUIStore.MainRunningApp)
         }
       }
     )

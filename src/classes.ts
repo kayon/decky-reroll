@@ -18,6 +18,7 @@ export interface Results {
   List: string[][]
   Round: number
   Time: string
+  CanUndo: boolean
 }
 
 export interface Process {
@@ -53,4 +54,4 @@ export enum ScanOptions {
 }
 
 export const MIN_RESULTS_THRESHOLD = 10
-export const MAX_RESULTS_THRESHOLD = 50
+export const MAX_RESULTS_THRESHOLD = 100

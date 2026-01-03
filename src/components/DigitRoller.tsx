@@ -1,4 +1,4 @@
-import React, { JSX, useState, useEffect, useRef, useMemo, useSyncExternalStore } from 'react'
+import React, { JSX, useState, useEffect, useRef, useMemo } from 'react'
 import { ValueTypes } from '@/classes'
 import { Focusable } from '@decky/ui'
 import { FaCaretUp, FaCaretDown } from 'react-icons/fa'
@@ -8,7 +8,6 @@ import { GamepadEventDetail } from '@decky/ui/src/components/FooterLegend'
 import { ActionSoundEffects, DigitRollerMetadata, PlaySound, ValueTypeMap } from '@/lib/utils'
 import SharedDpad from '@/components/SharedDpad'
 import SharedButtons from '@/components/SharedButtons'
-import { $store } from '@/store'
 
 interface DigitRollerProps {
   value: string
@@ -20,7 +19,9 @@ interface DigitRollerProps {
   isError?: boolean
   showType?: boolean
   theme?: DigitRollerTheme
+  autoFocus?: boolean
   mute?: boolean
+  isFullscreen?: boolean
 }
 
 export interface DigitRollerTheme {
@@ -34,7 +35,6 @@ const defaultTheme: DigitRollerTheme = {
 }
 
 const DigitRoller = (props: DigitRollerProps): JSX.Element => {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
   const theme = props.theme ?? defaultTheme
   const [isEditing, setIsEditing] = useState(false)
   const prevIsEditing = useRef(isEditing)
@@ -45,10 +45,11 @@ const DigitRoller = (props: DigitRollerProps): JSX.Element => {
   const lastCancelTime = useRef(0)
 
   const editingActions = {
-    [GamepadButton.DIR_UP]: Trans('ACTION_INCREASE', 'Increase'),
-    [GamepadButton.DIR_DOWN]: Trans('ACTION_DECREASE', 'Decrease'),
-    [GamepadButton.DIR_LEFT]: Trans('ACTION_MOVE', 'Move'),
-    [GamepadButton.DIR_RIGHT]: Trans('ACTION_MOVE', 'Move'),
+    // FooterLegend 溢出了, 这里隐藏一些吧
+    // [GamepadButton.DIR_UP]: Trans('ACTION_INCREASE', 'Increase'),
+    // [GamepadButton.DIR_DOWN]: Trans('ACTION_DECREASE', 'Decrease'),
+    // [GamepadButton.DIR_LEFT]: Trans('ACTION_MOVE', 'Move'),
+    // [GamepadButton.DIR_RIGHT]: Trans('ACTION_MOVE', 'Move'),
     // SECONDARY = X
     [GamepadButton.SECONDARY]: Trans('ACTION_RESET', 'Reset'),
     // OPTIONS = Y
@@ -165,7 +166,7 @@ const DigitRoller = (props: DigitRollerProps): JSX.Element => {
   const wrapperStyles: React.CSSProperties = {
     display: 'flex',
     paddingInline: '16px',
-    paddingBlock: state.footerLegendVisible ? '4px' : '8px',
+    paddingBlock: !props.isFullscreen ? '4px' : '8px',
     margin: '0 -16px',
     transition: 'background-color .32s cubic-bezier(0.17, 0.45, 0.14, 0.83)',
     backgroundColor: isHover ? '#32373d' : 'transparent',
@@ -262,6 +263,7 @@ const DigitRoller = (props: DigitRollerProps): JSX.Element => {
 
   return (
     <Focusable
+      autoFocus={props.autoFocus}
       onGamepadDirection={handleDirection}
       onSecondaryButton={handleSecondaryButton}
       onOptionsButton={handleOptionsButton}

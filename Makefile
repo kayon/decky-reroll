@@ -2,7 +2,7 @@
 
 DECKY_CLI := $(CURDIR)/cli/decky
 PLUGIN_NAME="Reroll"
-PLUGIN_DIR_NAME="decky-reroll"
+PLUGIN_DIR_NAME="Reroll"
 
 DECK_USER=deck
 DECK_PASS?=$(DECK_PWD)

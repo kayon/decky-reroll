@@ -3,16 +3,18 @@ import { DialogButton, Focusable } from '@decky/ui'
 import Trans from '@/lib/i18n'
 import { FaCog } from 'react-icons/fa'
 import { InternalRouting } from '@/classes'
-import { $store } from '@/store'
+import { $globalState } from '@/stores/global'
 
 interface MainActionsProps {
   firstScannable: boolean
   nextScannable: boolean
+  undoScannable: boolean
   resettable: boolean
   disabled: boolean
 
   onFirstScan: () => void
   onNextScan: () => void
+  onUndoScan: () => void
   onResetScan: () => void
 }
 
@@ -33,7 +35,7 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
   }
 
   const handleOpenSetting = () => {
-    $store.navigation(InternalRouting.Settings)
+    $globalState.navigation(InternalRouting.Settings)
   }
 
   return (
@@ -87,7 +89,6 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
           }
         `}</style>
         <DialogButton
-          key={1}
           className="btn-action"
           onClick={props.onFirstScan}
           disabled={props.disabled || !props.firstScannable}
@@ -97,7 +98,6 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
         </DialogButton>
 
         <DialogButton
-          key={2}
           className="btn-action"
           onClick={props.onNextScan}
           disabled={props.disabled || !props.nextScannable}
@@ -106,8 +106,18 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
           {Trans('NEXT_SCAN', 'Next Scan')}
         </DialogButton>
 
+        {props.undoScannable && (
+          <DialogButton
+            className="btn-action"
+            onClick={props.onUndoScan}
+            disabled={props.disabled}
+            focusable={!props.disabled}
+          >
+            {Trans('UNDO_SCAN', 'Undo')}
+          </DialogButton>
+        )}
+
         <DialogButton
-          key={3}
           className="btn-action"
           onClick={props.onResetScan}
           disabled={props.disabled || !props.resettable}
@@ -117,7 +127,7 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
         </DialogButton>
 
         {!props.resettable && (
-          <DialogButton key={4} className="btn-action setting" onClick={handleOpenSetting}>
+          <DialogButton className="btn-action setting" onClick={handleOpenSetting}>
             <FaCog />
           </DialogButton>
         )}

@@ -43,6 +43,9 @@ class Plugin:
     async def next_scan(self, value: str):
         return Memscan.next_scan(value)
 
+    async def undo_scan(self):
+        return Memscan.undo_scan()
+
     async def change_values(self, value: str, indexes: list):
         return Memscan.change_values(value, indexes)
 

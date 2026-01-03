@@ -1,12 +1,13 @@
 import { DialogButton, Focusable, Marquee } from '@decky/ui'
-import { JSX, memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
-import { $store } from '@/store'
+import { JSX, memo, useEffect, useMemo, useState } from 'react'
 import Backend from '@/lib/backend'
 import Trans from '@/lib/i18n'
 import showQRCodeModal from '@/lib/ShowQRCodeModal'
-import { InternalRouting } from '@/classes'
+import { AppGame, InternalRouting } from '@/classes'
 import { Process } from '@/classes'
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from 'react-icons/ri'
+import { $globalState } from '@/stores/global'
+import { Snapshot } from 'valtio'
 
 const ProcessItem = memo(
   ({
@@ -59,8 +60,15 @@ const ProcessItem = memo(
 
 ProcessItem.displayName = 'ProcessItem'
 
-const GameProcess = (): JSX.Element => {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
+interface GameProcessProps {
+  game?: AppGame
+  process?: Snapshot<Process> | null
+  // 当在游戏中显示 QuickAccess 时视为全屏
+  // 通过 !footerLegendVisible 判断
+  isFullscreen: boolean
+}
+
+const GameProcess = (props: GameProcessProps): JSX.Element => {
   const [processes, setProcesses] = useState<Process[]>([])
   const [activeIndex, setActiveIndex] = useState<number>(-1)
 
@@ -74,8 +82,8 @@ const GameProcess = (): JSX.Element => {
   useEffect(() => {
     let isMounted = true
     const load = async () => {
-      if (state.game) {
-        const procs = await Backend.GetGameProcesses(state.game.appid)
+      if (props.game) {
+        const procs = await Backend.GetGameProcesses(props.game.appid)
         if (isMounted) {
           setProcesses(procs ?? [])
         }
@@ -85,32 +93,20 @@ const GameProcess = (): JSX.Element => {
     return () => {
       isMounted = false
     }
-  }, [state.game])
-
-  const autoSelectGameProcess = useCallback(async (): Promise<boolean> => {
-    if (state.game) {
-      if (state.process) {
-        return true
-      }
-      const process = await Backend.AutoSelectGameProcess(state.game.appid)
-      $store.setState({ process })
-      return process !== null
-    }
-    return false
-  }, [state.game, state.process])
+  }, [props.game])
 
   useEffect(() => {
     let timer: number | null = null
     let isMounted = true
 
     const checkProcess = async () => {
-      const hasProcess = await autoSelectGameProcess()
+      const hasProcess = await $globalState.autoSelectGameProcess()
       if (!hasProcess && isMounted) {
         timer = window.setTimeout(checkProcess, 2e3)
       }
     }
 
-    checkProcess()
+    checkProcess().then()
 
     return () => {
       isMounted = false
@@ -118,41 +114,24 @@ const GameProcess = (): JSX.Element => {
         clearTimeout(timer)
       }
     }
-  }, [autoSelectGameProcess])
-
-  const handleSelectProcess = async (proc: Process) => {
-    if (!state.game || !proc) {
-      return
-    }
-    if (proc.PID === state.process?.PID) {
-      return
-    }
-    const process = await Backend.SelectGameProcess(state.game.appid, proc.PID)
-    $store.setState({
-      scanValue: '',
-      scanValueError: false,
-      results: null,
-      process: process
-    })
-    await Backend.ResetScan()
-  }
+  }, [])
 
   const renderProcessDetail = () => {
-    const proc = ActiveProcess ?? state.process
+    const proc = ActiveProcess ?? props.process
     return (
       <div className="process-detail">
         <div className="process-detail-row">
           <label>AppID</label>
-          <div>{state.game?.appid}</div>
+          <div>{props.game?.appid ?? '-'}</div>
         </div>
         <div className="process-detail-row">
           <label>PID</label>
           <div
             style={{
-              ...(state.process?.PID === proc?.PID ? { color: '#6bcc62' } : {}),
+              ...(props.process?.PID === proc?.PID ? { color: '#6bcc62' } : {}),
             }}
           >
-            {proc?.PID}
+            {proc?.PID ?? '-'}
           </div>
         </div>
         <div className="process-detail-command">{proc?.Command}</div>
@@ -163,7 +142,7 @@ const GameProcess = (): JSX.Element => {
   return (
     <div
       style={{
-        height: `${(state.footerLegendVisible ? 440 : 480) - 47 - 34 - 10}px`,
+        height: `${(!props.isFullscreen ? 440 : 480) - 47 - 34 - 10}px`,
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -269,11 +248,11 @@ const GameProcess = (): JSX.Element => {
             item={proc}
             index={index}
             isActive={index === activeIndex}
-            isSelected={proc.PID === state.process?.PID}
+            isSelected={proc.PID === props.process?.PID}
             onFocus={() => setActiveIndex(index)}
             onBlur={() => setActiveIndex(-1)}
-            onSelect={() => handleSelectProcess(proc)}
-            onCancel={() => $store.navigation(InternalRouting.Main)}
+            onSelect={() => $globalState.selectGameProcess(proc.PID)}
+            onCancel={() => $globalState.navigation(InternalRouting.Main)}
           />
         ))}
       </div>
@@ -290,7 +269,7 @@ const GameProcess = (): JSX.Element => {
         </div>
         <DialogButton
           onClick={() => showQRCodeModal('https://github.com/kayon/decky-reroll/issues')}
-          onCancelButton={() => $store.navigation(InternalRouting.Main)}
+          onCancelButton={() => $globalState.navigation(InternalRouting.Main)}
           style={{
             paddingBlock: 0,
             height: '30px',

@@ -32,6 +32,9 @@ lib.FirstScan.restype = ctypes.c_void_p
 lib.NextScan.argtypes = [ctypes.c_char_p]
 lib.NextScan.restype = ctypes.c_void_p
 
+lib.UndoScan.argtypes = []
+lib.UndoScan.restype = ctypes.c_void_p
+
 lib.ChangeValues.argtypes = [ctypes.c_char_p, ctypes.POINTER(ctypes.c_int32), ctypes.c_int]
 lib.ChangeValues.restype = ctypes.c_void_p
 
@@ -88,6 +91,10 @@ class Memscan:
     @staticmethod
     def next_scan(value: str):
         return Memscan.__call(lib.NextScan, value.encode('utf-8'))
+
+    @staticmethod
+    def undo_scan():
+        return Memscan.__call(lib.UndoScan)
 
     @staticmethod
     def change_values(value: str, indexes: list):

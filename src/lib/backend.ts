@@ -1,6 +1,6 @@
 import { callable } from '@decky/api'
 import { Results, Process, ScanOptions, ValueTypes } from '@/classes'
-import { Settings } from '@/store'
+import { Settings } from '@/stores/settings'
 
 const GetSetting = callable<[key: keyof Settings, fallback: unknown], unknown>('get_setting')
 const SetSetting = callable<[key: keyof Settings, value: unknown], void>('set_setting')
@@ -17,6 +17,7 @@ const FirstScan = callable<
   Results | null
 >('first_scan')
 const NextScan = callable<[value: string], Results | null>('next_scan')
+const UndoScan = callable<[], Results | null>('undo_scan')
 const ChangeValues = callable<[value: string, indexes: number[]], Results | null>('change_values')
 const RefreshValues = callable<[], Results | null>('refresh_values')
 
@@ -32,6 +33,7 @@ export default {
   AutoSelectGameProcess,
   FirstScan,
   NextScan,
+  UndoScan,
   ChangeValues,
   RefreshValues,
 }

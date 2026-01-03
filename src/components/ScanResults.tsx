@@ -1,21 +1,19 @@
-import { Results, ValueTypes } from '@/classes'
-import React, { JSX, useSyncExternalStore } from 'react'
+import React, { JSX } from 'react'
 import { DialogButton, PanelSectionRow } from '@decky/ui'
 import Trans from '@/lib/i18n'
 import DigitRoller from '@/components/DigitRoller'
 import { ActionSoundEffects, IsValueValid, PlaySound } from '@/lib/utils'
 import AddressList from '@/components/AddressList'
-import { $store } from '@/store'
+import { useSnapshot } from 'valtio'
+import { $globalState, globalState } from '@/stores/global'
 
 interface ScanResultsProps {
-  data: Results | null
-  scanType: ValueTypes
   onChangeValues: (value: string, ...indexes: number[]) => void
   onRefreshValues: () => void
 }
 
 const ScanResults = (props: ScanResultsProps): JSX.Element => {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
+  const globalStateSnap = useSnapshot(globalState)
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -25,14 +23,12 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
   }
 
   const checkInput = () => {
-    if (!state.changeValue) {
+    if (!globalState.changeValue) {
       PlaySound(ActionSoundEffects.DigitRollerOut)
       return
     }
-    const invalid = !IsValueValid(state.changeValue, props.scanType)
-    $store.setState({
-      changeValueError: invalid,
-    })
+    const invalid = !IsValueValid(globalState.changeValue, globalState.scanType)
+    globalState.changeValueError = invalid
     if (invalid) {
       PlaySound(ActionSoundEffects.DigitRollerError)
     } else {
@@ -41,36 +37,34 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
   }
 
   const onChangeValue = (value: string) => {
-    $store.setState({
-      changeValue: value,
-    })
+    globalState.changeValue = value
   }
 
   const handleChangeItemValue = async (index: number) => {
-    if (state.changeValueError) {
+    if (globalState.changeValueError) {
       return
     }
-    props.onChangeValues(state.changeValue, index)
+    props.onChangeValues(globalState.changeValue, index)
   }
 
   const handleChangeAllValues = async () => {
-    if (!props.data || props.data.List.length === 0) {
+    if (!globalState.results || globalState.results.List.length === 0) {
       return
     }
-    if (state.changeValueError) {
+    if (globalState.changeValueError) {
       return
     }
-    props.onChangeValues(state.changeValue)
+    props.onChangeValues(globalState.changeValue)
   }
 
   const handleRefreshValues = async () => {
-    if (!props.data || props.data.List.length === 0) {
+    if (!globalState.results || globalState.results.List.length === 0) {
       return
     }
     props.onRefreshValues()
   }
 
-  if (!props.data) {
+  if (!globalStateSnap.results) {
     return <></>
   }
 
@@ -78,7 +72,7 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
     return (
       <div className="pagination">
         <div>
-          {state.results_page}/{state.results_max_page}
+          {globalStateSnap.results_page}/{globalStateSnap.results_max_page}
         </div>
       </div>
     )
@@ -180,39 +174,41 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
       `}</style>
 
       <div className="scan-results-header">
-        {state.footerLegendVisible && props.data.List.length > 0 && renderPagination()}
+        {globalStateSnap.footerLegendVisible &&
+          globalStateSnap.results.List.length > 0 &&
+          renderPagination()}
         <div
-          className={`scan-results-found ${props.data.List.length > 0 ? 'changeable' : props.data.Count === 0 ? 'zero' : ''}`}
+          className={`scan-results-found ${globalStateSnap.results.List.length > 0 ? 'changeable' : globalStateSnap.results.Count === 0 ? 'zero' : ''}`}
         >
           {Trans('FOUND', 'Found')}
-          <b>{props.data.Count}</b>
+          <b>{globalStateSnap.results.Count}</b>
         </div>
-        {props.data.List.length > 1 ? (
+        {globalStateSnap.results.List.length > 1 ? (
           <div className="scan-results-action">
             <DialogButton className="btn-change-all" onClick={handleChangeAllValues}>
               {Trans('ACTION_CHANGE_ALL_VALUES', 'Change all')}
             </DialogButton>
           </div>
         ) : (
-          props.data.Time && (
+          globalStateSnap.results.Time && (
             <div className="scan-results-details">
-              time<span>{props.data.Time}</span>
+              time<span>{globalStateSnap.results.Time}</span>
             </div>
           )
         )}
       </div>
 
-      {props.data.List.length > 0 && (
+      {globalStateSnap.results.List.length > 0 && (
         <PanelSectionRow>
           <DigitRoller
-            value={state.changeValue}
-            type={props.scanType}
+            value={globalStateSnap.changeValue}
+            type={globalStateSnap.scanType}
             onChange={onChangeValue}
             onEnter={() => {
               PlaySound(ActionSoundEffects.DigitRollerIn)
             }}
             onLeave={checkInput}
-            isError={state.changeValueError}
+            isError={globalStateSnap.changeValueError}
             showType={true}
             theme={{
               background: '#6bcc62',
@@ -223,10 +219,14 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
       )}
 
       <AddressList
-        data={props.data.List}
+        data={globalStateSnap.results.List}
+        page={globalStateSnap.results_page}
+        maxPage={globalStateSnap.results_max_page}
+        setPage={$globalState.setResultsCurrentPage}
         onSelectItem={handleChangeItemValue}
-        previewView={state.changeValue}
+        previewView={globalStateSnap.changeValue}
         onRefresh={handleRefreshValues}
+        isFullscreen={!globalStateSnap.footerLegendVisible}
       />
     </div>
   )

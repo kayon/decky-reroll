@@ -15,6 +15,7 @@
   "GAME_INACTIVE": "ゲーム未起動",
   "FIRST_SCAN": "新規スキャン",
   "NEXT_SCAN": "次をスキャン",
+  "UNDO_SCAN": "元に戻す",
   "RESET_SCAN": "リセット",
   "FOUND": "検索結果",
 
@@ -22,7 +23,7 @@
   "RESET_DEFAULT": "初期設定に戻す",
   "RESULTS_THRESHOLD": "結果表示しきい値",
   "SCAN_OPTION_FLOAT": "浮動小数点数オプション",
-  "SCAN_OPTION_FLOAT_UNROUNDED": "高速",
+  "SCAN_OPTION_FLOAT_UNROUNDED": "丸めなし",
   "SCAN_OPTION_FLOAT_ROUNDED": "丸め (四捨五入)",
   "SCAN_OPTION_FLOAT_EXTREME": "丸め (端数処理)",
   "SCAN_OPTION_FLOAT_TRUNCATED": "切り捨て",

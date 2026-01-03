@@ -15,6 +15,7 @@
   "GAME_INACTIVE": "游戏未启动",
   "FIRST_SCAN": "新的扫描",
   "NEXT_SCAN": "再次扫描",
+  "UNDO_SCAN": "撤销",
   "RESET_SCAN": "重置",
   "FOUND": "找到",
 
@@ -22,7 +23,7 @@
   "RESET_DEFAULT": "恢复默认设置",
   "RESULTS_THRESHOLD": "结果显示阈值",
   "SCAN_OPTION_FLOAT": "浮点数选项",
-  "SCAN_OPTION_FLOAT_UNROUNDED": "快速",
+  "SCAN_OPTION_FLOAT_UNROUNDED": "不舍入",
   "SCAN_OPTION_FLOAT_ROUNDED": "舍入 (四舍五入)",
   "SCAN_OPTION_FLOAT_EXTREME": "舍入 (取极值)",
   "SCAN_OPTION_FLOAT_TRUNCATED": "截断",

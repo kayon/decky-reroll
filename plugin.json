@@ -1,7 +1,7 @@
 {
   "name": "Reroll",
   "author": "Kayon",
-  "flags": [""],
+  "flags": ["root"],
   "api_version": 1,
   "publish": {
     "tags": ["cheat", "memory"],

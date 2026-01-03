@@ -1,5 +1,5 @@
 import React, { JSX, useEffect, useRef } from 'react'
-import { $store } from '@/store'
+import { $globalState } from '@/stores/global'
 
 interface PanelContainerProps {
   children: React.ReactNode
@@ -27,7 +27,7 @@ const PanelContainer = (props: PanelContainerProps): JSX.Element => {
       if (entries.length > 0) {
         const { height } = entries[0].contentRect
         if (height > 0) {
-          $store.updateRootContainerHeight(height)
+          $globalState.updateRootContainerHeight(height)
         }
       }
     })

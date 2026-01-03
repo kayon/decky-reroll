@@ -3,7 +3,7 @@ set -e
 
 echo "Container's IP address: `awk 'END{print $1}' /etc/hosts`"
 
-BACKEND_VERSION="v0.2.2"
+BACKEND_VERSION="v0.3.0"
 BACKEND_SHARED="memscan.so"
 RELEASE_URL="https://github.com/kayon/memscan/releases/download/$BACKEND_VERSION/$BACKEND_SHARED"
 

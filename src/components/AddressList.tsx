@@ -1,19 +1,24 @@
 import { Focusable } from '@decky/ui'
-import { JSX, memo, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { JSX, memo, useEffect, useMemo, useRef, useState } from 'react'
 import { GamepadButton } from '@decky/ui/dist/components/FooterLegend'
 import Trans from '@/lib/i18n'
 import SharedDpad from '@/components/SharedDpad'
 import SharedButtons from '@/components/SharedButtons'
-import { $store, NUMBER_RESULTS_PRE_PAGE } from '@/store'
 import { GamepadEventDetail } from '@decky/ui/src/components/FooterLegend'
 import { RiArrowDropRightLine, RiArrowDropLeftLine } from 'react-icons/ri'
 import { ActionSoundEffects, PlaySound } from '@/lib/utils'
+import { Snapshot } from 'valtio'
+import { NUMBER_RESULTS_PRE_PAGE } from '@/stores/global'
 
 interface AddressListProps {
-  data: string[][]
+  data: Snapshot<string[][]>
+  page: number
+  maxPage: number
+  setPage: (page:number) => boolean
   onSelectItem: (index: number) => void
-  previewView: string
   onRefresh: () => void
+  previewView: string
+  isFullscreen?: boolean
 }
 
 const AddressItem = memo(
@@ -27,7 +32,7 @@ const AddressItem = memo(
     previewNumValue,
     isAutoFocus,
   }: {
-    item: string[]
+    item: Readonly<string[]>
     index: number
     isActive: boolean
     onFocus: () => void
@@ -74,6 +79,7 @@ const AddressItem = memo(
   },
   (prev, next) => {
     return (
+      prev.index === next.index &&
       prev.item[0] === next.item[0] &&
       prev.item[1] === next.item[1] &&
       prev.isActive === next.isActive &&
@@ -85,7 +91,6 @@ const AddressItem = memo(
 AddressItem.displayName = 'AddressItem'
 
 const AddressList = (props: AddressListProps): JSX.Element => {
-  const state = useSyncExternalStore($store.subscribe, $store.state)
   const previewNumValue = Number(props.previewView)
   const [activeIndex, setActiveIndex] = useState<number>(-1)
   const [isHover, setIsHover] = useState(false)
@@ -98,12 +103,12 @@ const AddressList = (props: AddressListProps): JSX.Element => {
       return []
     }
 
-    const currentPage = state.results_page || 1
+    const currentPage = props.page || 1
     const startIndex = (currentPage - 1) * NUMBER_RESULTS_PRE_PAGE
     const endIndex = startIndex + NUMBER_RESULTS_PRE_PAGE
 
     return data.slice(startIndex, endIndex)
-  }, [data, state.results_page])
+  }, [data, props.page])
 
   const ActiveIndex = useMemo(() => {
     if (!Data || activeIndex >= Data.length) {
@@ -129,12 +134,12 @@ const AddressList = (props: AddressListProps): JSX.Element => {
   const handleDirection = (event: CustomEvent<GamepadEventDetail>) => {
     const button = event.detail.button
     if (button === GamepadButton.DIR_LEFT) {
-      if ($store.setPage(state.results_page - 1)) {
+      if (props.setPage(props.page - 1)) {
         PlaySound(ActionSoundEffects.DigitRollerTyping)
       }
       return
     } else if (button === GamepadButton.DIR_RIGHT) {
-      if ($store.setPage(state.results_page + 1)) {
+      if (props.setPage(props.page + 1)) {
         PlaySound(ActionSoundEffects.DigitRollerTyping)
       }
       return
@@ -154,11 +159,11 @@ const AddressList = (props: AddressListProps): JSX.Element => {
       <div className="address-list-guide">
         <div className="pagination">
           <div>
-            {state.results_page}/{state.results_max_page}
+            {props.page}/{props.maxPage}
           </div>
         </div>
         <div className="guide">
-          {state.results_max_page > 1 && (
+          {props.maxPage > 1 && (
             <SharedDpad left={true} right={true}>
               <div>{Trans('ACTION_PREV_PAGE', 'Prev')}</div>
               <div>{Trans('ACTION_NEXT_PAGE', 'Next')}</div>
@@ -329,10 +334,10 @@ const AddressList = (props: AddressListProps): JSX.Element => {
         }
       `}</style>
       <div className={`address-list ${props.data.length > 0 ? 'focused' : ''}`}>
-        {!state.footerLegendVisible && renderGuide()}
+        {props.isFullscreen && renderGuide()}
         <div className="address-list-content">
           {Data.map((item, index) => {
-            const absoluteIndex = index + (state.results_page - 1) * NUMBER_RESULTS_PRE_PAGE
+            const absoluteIndex = index + (props.page - 1) * NUMBER_RESULTS_PRE_PAGE
             return (
               <AddressItem
                 key={item[0]}

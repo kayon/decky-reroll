@@ -6,7 +6,7 @@ interface LoadingProps {
 }
 
 const Loading = ({ hidden, size }: LoadingProps): JSX.Element => {
-  const iconSize = size ?? 24
+  const iconSize = size ?? 26
   return (
     <svg
       width={iconSize}
