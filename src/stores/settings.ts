@@ -8,11 +8,13 @@ export const DEFAULT_SCAN_OPTION = ScanOptions.FloatRounded
 export interface Settings {
   ResultsThreshold: number
   ScanOption: ScanOptions
+  HasAcceptedDisclaimer: boolean
 }
 
 const initialSettings = {
   ResultsThreshold: MIN_RESULTS_THRESHOLD,
   ScanOption: ScanOptions.FloatUnrounded,
+  HasAcceptedDisclaimer: false,
 }
 
 export const settings = proxy<Settings>({...initialSettings})
@@ -28,6 +30,11 @@ export const $settings = {
       'ScanOption',
       DEFAULT_SCAN_OPTION
     )) as ScanOptions
+
+    settings.HasAcceptedDisclaimer = (await Backend.GetSetting(
+      'HasAcceptedDisclaimer',
+      false
+    )) as boolean
 
     await Backend.SetRenderResultsThreshold(settings.ResultsThreshold)
   },
@@ -46,4 +53,11 @@ export const $settings = {
       await Backend.SetSetting('ScanOption', settings.ScanOption)
     }
   },
+
+  async acceptDisclaimer() {
+    if (!settings.HasAcceptedDisclaimer) {
+      settings.HasAcceptedDisclaimer = true
+      await Backend.SetSetting('HasAcceptedDisclaimer', true)
+    }
+  }
 }

@@ -29,5 +29,13 @@
   "SCAN_OPTION_FLOAT_TRUNCATED": "截断",
 
   "WRONG_PROCESS": "错误的进程？",
-  "REPORT_ISSUE": "报告问题"
+  "REPORT_ISSUE": "报告问题",
+
+  "TERMS_OF_USE_DISCLAIMER": "使用条款与免责声明",
+  "AGREE":" 同意",
+
+  "DISCLAIMER_REROLL": "<b>Reroll</b> 是一款通用的内存研究工具。本程序独立开发，<b>不包含</b>任何属于第三方游戏开发商或发行商的专有资产、受版权保护的源代码或破解机制。",
+  "DISCLAIMER_ROOT": "<b>Root 权限</b>：本插件需要 <b>Root 权限</b> 以执行内存读写操作。继续操作即表示您授权本软件完全访问系统进程内存。",
+  "DISCLAIMER_AS_IS": "<b>按原样提供与免责</b>：本软件按<b>原样</b>提供，不附带任何形式的保证。开发者不对系统不稳定、数据丢失或账号相关问题承担责任。",
+  "DISCLAIMER_OFFLINE": "<b>仅限单机</b>：本工具仅限用于<b>单机/离线</b>环境。<b>严禁</b>在任何在线或多人游戏中使用。"
 }

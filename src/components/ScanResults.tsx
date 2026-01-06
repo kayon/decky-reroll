@@ -214,6 +214,7 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
               background: '#6bcc62',
               foreground: '#274a23',
             }}
+            isFullscreen={globalStateSnap.footerLegendVisible}
           />
         </PanelSectionRow>
       )}

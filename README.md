@@ -31,12 +31,15 @@ This update introduces a major overhaul of the scanning engine, delivering signi
 ### Method 2: Install via URL (For Beta/Latest Updates)
 If you wish to install a specific version or a pre-release directly:
 1. Open **Settings** in the Decky Loader menu.
-2. Go to the **Developer** tab.
-3. Find the **Install from URL** field.
-4. Paste the following URL:
+2. Enable **Developer Mode**.
+3. Go to the **Developer** tab.
+4. **Choose an installation method:**
+   * **Install via URL:** Paste the following URL into the **Install from URL** field and click **Install**:
+     ```text
+     https://github.com/kayon/decky-reroll/releases/latest/download/Reroll.zip
+     ```
+   * **Install from Local Zip:** Download the `Reroll.zip` file from the [Releases](https://github.com/kayon/decky-reroll/releases) page to your Steam Deck. Then, click **Install Plugin from Zip** and select the downloaded file.
 
-   `https://github.com/kayon/decky-reroll/releases/latest/download/Reroll.zip`
-5. Click **Install**.
 
 ## Why does this plugin require root privileges?
 `Proton` games usually do not require `root` privileges to access memory because `Proton` runs as the `deck` user.

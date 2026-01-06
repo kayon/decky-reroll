@@ -1,16 +1,9 @@
-import {
-  PanelSection,
-  PanelSectionRow,
-  quickAccessMenuClasses,
-} from '@decky/ui'
+import { PanelSection, PanelSectionRow, quickAccessMenuClasses } from '@decky/ui'
 import { definePlugin } from '@decky/api'
 import React, { useEffect, useMemo } from 'react'
 import { RiDiceFill } from 'react-icons/ri'
 import DigitRoller from './components/DigitRoller'
-import {
-  InternalRouting,
-  ValueTypes,
-} from './classes'
+import { InternalRouting, ValueTypes } from './classes'
 import {
   ActionSoundEffects,
   IsValueValid,
@@ -33,9 +26,11 @@ import GameProcess from '@/components/GameProcess'
 import Settings from '@/components/Settings'
 import { useSnapshot } from 'valtio'
 import { $settings, settings } from '@/stores/settings'
+import Disclaimer from '@/components/Disclaimer'
 
 function Content() {
   const globalStateSnap = useSnapshot(globalState)
+  const settingsSnap = useSnapshot(settings)
 
   useEffect(() => {
     $globalState.setGame(window.SteamUIStore.MainRunningApp)
@@ -191,6 +186,7 @@ function Content() {
             disabled={globalStateSnap.loading}
             showType={NextScannable}
             autoFocus
+            isFullscreen={globalStateSnap.footerLegendVisible}
           />
         </PanelSectionRow>
 
@@ -213,6 +209,10 @@ function Content() {
     )
   }
 
+  if (!settingsSnap.HasAcceptedDisclaimer) {
+    return <Disclaimer onAgree={$settings.acceptDisclaimer} />
+  }
+
   if (globalStateSnap.route === InternalRouting.Settings) {
     return <Settings />
   }
@@ -225,11 +225,13 @@ function Content() {
         </PanelSectionRow>
 
         {globalStateSnap.route === InternalRouting.Main && renderMainPanel()}
-        {globalStateSnap.route === InternalRouting.ProcessDetails && <GameProcess
-          game={globalStateSnap.game}
-          process={globalStateSnap.process}
-          isFullscreen={!globalStateSnap.footerLegendVisible}
-        />}
+        {globalStateSnap.route === InternalRouting.ProcessDetails && (
+          <GameProcess
+            game={globalStateSnap.game}
+            process={globalStateSnap.process}
+            isFullscreen={!globalStateSnap.footerLegendVisible}
+          />
+        )}
       </PanelSection>
     </PanelContainer>
   )
@@ -287,12 +289,7 @@ export default definePlugin(() => {
 
   registry.push(
     window.SteamClient.Apps.RegisterForGameActionUserRequest(
-      (
-        _gameActionId: number,
-        _appId: string,
-        action: string,
-        requestedAction: string
-      ) => {
+      (_gameActionId: number, _appId: string, action: string, requestedAction: string) => {
         Logger.debug('GameActionUserRequest', action, requestedAction)
         // 在 AppLifetimeNotifications 中不设置
         // 防止过早打开 GameProcess 选择了错误的进程

@@ -29,5 +29,13 @@
   "SCAN_OPTION_FLOAT_TRUNCATED": "截斷",
 
   "WRONG_PROCESS": "錯誤的程序？",
-  "REPORT_ISSUE": "回報問題"
+  "REPORT_ISSUE": "回報問題",
+
+  "TERMS_OF_USE_DISCLAIMER": "使用條款與免責聲明",
+  "AGREE": "同意",
+
+  "DISCLAIMER_REROLL": "<b>Reroll</b> 是一款通用的記憶體研究工具。本程式獨立開發，<b>不包含</b>任何屬於第三方遊戲開發商或發行商的專有資產、受版權保護的原始碼或破解機制。",
+  "DISCLAIMER_ROOT": "<b>Root 權限</b>：本插件需要 <b>Root 權限</b> 以執行記憶體讀寫操作。繼續操作即表示您授權本軟體完全存取系統程序記憶體。",
+  "DISCLAIMER_AS_IS": "<b>按原樣提供與免責</b>：本軟體按<b>原樣</b>提供，不附帶任何形式的保證。開發者不對系統不穩定、數據遺失或帳號相關問題承擔責任。",
+  "DISCLAIMER_OFFLINE": "<b>僅限單機</b>：本工具僅限用於<b>單機/離線</b>環境。<b>嚴禁</b>在任何連線或多人遊戲中使用。"
 }

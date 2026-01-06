@@ -5,7 +5,13 @@ import {
   DEFAULT_SCAN_OPTION,
   settings,
 } from '@/stores/settings'
-import { DialogButton, Focusable, PanelSection, PanelSectionRow, SliderField } from '@decky/ui'
+import {
+  ButtonItem,
+  Focusable,
+  PanelSection,
+  PanelSectionRow,
+  SliderField,
+} from '@decky/ui'
 import {
   InternalRouting,
   MAX_RESULTS_THRESHOLD,
@@ -142,9 +148,9 @@ const Settings = (): JSX.Element => {
         </PanelSectionRow>
 
         <PanelSectionRow>
-          <DialogButton disabled={!canReset} onClick={handleResetDefault}>
+          <ButtonItem layout="below" disabled={!canReset} onClick={handleResetDefault}>
             {Trans('RESET_DEFAULT', 'Reset to Default')}
-          </DialogButton>
+          </ButtonItem>
         </PanelSectionRow>
 
         <div
@@ -152,9 +158,7 @@ const Settings = (): JSX.Element => {
             width: '100%',
             fontSize: '10px',
             color: '#FFFFFF5F',
-            padding: '4px 0',
             margin: '8px 0',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
             textAlign: 'right',
           }}
         >

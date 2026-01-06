@@ -4,8 +4,8 @@
   "flags": ["root"],
   "api_version": 1,
   "publish": {
-    "tags": ["cheat", "memory"],
-    "description": "A high-performance memory scanning plugin for the Steam Deck.",
+    "tags": ["tools", "utility", "developer", "memory"],
+    "description": "A high-performance memory scanning plugin for the Steam Deck. [WARNING: Strictly for offline/single-player use only. Use at your own risk.]",
     "image": "https://raw.githubusercontent.com/kayon/decky-reroll/refs/heads/main/image/readme/ScreenShot.png"
   }
 }

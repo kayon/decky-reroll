@@ -166,7 +166,7 @@ const DigitRoller = (props: DigitRollerProps): JSX.Element => {
   const wrapperStyles: React.CSSProperties = {
     display: 'flex',
     paddingInline: '16px',
-    paddingBlock: !props.isFullscreen ? '4px' : '8px',
+    paddingBlock: props.isFullscreen ? '4px' : '8px',
     margin: '0 -16px',
     transition: 'background-color .32s cubic-bezier(0.17, 0.45, 0.14, 0.83)',
     backgroundColor: isHover ? '#32373d' : 'transparent',

@@ -1,7 +1,7 @@
 export enum InternalRouting {
   Main = 0,
   ProcessDetails = 1,
-  Settings = 2
+  Settings = 2,
 }
 
 export enum ValueTypes {
