@@ -1,4 +1,4 @@
-import React, { JSX } from 'react'
+import React, { JSX, useEffect, useState } from 'react'
 import { DialogButton, PanelSectionRow } from '@decky/ui'
 import Trans from '@/lib/i18n'
 import DigitRoller from '@/components/DigitRoller'
@@ -6,6 +6,7 @@ import { ActionSoundEffects, IsValueValid, PlaySound } from '@/lib/utils'
 import AddressList from '@/components/AddressList'
 import { useSnapshot } from 'valtio'
 import { $globalState, globalState } from '@/stores/global'
+import Backend from '@/lib/backend'
 
 interface ScanResultsProps {
   onChangeValues: (value: string, ...indexes: number[]) => void
@@ -14,6 +15,7 @@ interface ScanResultsProps {
 
 const ScanResults = (props: ScanResultsProps): JSX.Element => {
   const globalStateSnap = useSnapshot(globalState)
+  const [frozenIndices, setFrozenIndices] = useState<number[]>([])
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -21,6 +23,18 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
     transition: 'background-color .32s cubic-bezier(0.17, 0.45, 0.14, 0.83)',
     paddingBlock: 0,
   }
+
+  const syncFrozenIndices = () => {
+    Backend.GetFrozenIndices().then((res) => {
+      if (Array.isArray(res)) {
+        setFrozenIndices(res)
+      }
+    })
+  }
+
+  useEffect(() => {
+    syncFrozenIndices()
+  }, [globalStateSnap.results])
 
   const checkInput = () => {
     if (!globalState.changeValue) {
@@ -57,8 +71,37 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
     props.onChangeValues(globalState.changeValue)
   }
 
-  const handleRefreshValues = async () => {
+  const handleToggleFreezeAll = async () => {
     if (!globalState.results || globalState.results.List.length === 0) {
+      return
+    }
+
+    const nextFreeze = frozenIndices.length < globalState.results.List.length
+    const count = globalState.results.List.length
+    const allIndexes = Array.from({ length: count }, (_, i) => i)
+
+    setFrozenIndices(nextFreeze ? allIndexes : [])
+    PlaySound(ActionSoundEffects.DigitRollerTyping)
+
+    for (const idx of allIndexes) {
+      const val = globalState.results.List[idx]?.[1] || globalState.changeValue
+      await Backend.ToggleFreeze(idx, val, nextFreeze)
+    }
+  }
+
+  const handleToggleFreezeItem = async (index: number, currentValue: string) => {
+    const willFreeze = !frozenIndices.includes(index)
+
+    setFrozenIndices((prev) =>
+      willFreeze ? [...prev, index] : prev.filter((i) => i !== index)
+    )
+    PlaySound(ActionSoundEffects.DigitRollerTyping)
+
+    await Backend.ToggleFreeze(index, currentValue, willFreeze)
+  }
+
+  const handleRefreshValues = async () => {
+    if (globalState.loading || !globalState.results || globalState.results.List.length === 0) {
       return
     }
     props.onRefreshValues()
@@ -147,12 +190,21 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 4px;
             overflow: hidden;
             > .btn-change-all {
               height: 20px !important;
-              padding: 0 8px !important;
-              font-size: 12px !important;
+              padding: 0 6px !important;
+              font-size: 11px !important;
               min-width: 0 !important;
+            }
+            > .btn-lock-value {
+              height: 20px !important;
+              padding: 0 6px !important;
+              font-size: 11px !important;
+              min-width: 0 !important;
+              background-color: ${frozenIndices.length > 0 ? '#5dade2' : 'rgba(255, 255, 255, 0.2)'};
+              color: ${frozenIndices.length > 0 ? '#23262e' : 'white'};
             }
           }
           
@@ -172,22 +224,32 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
           }
         }
       `}</style>
-
       <div className="scan-results-header">
         {globalStateSnap.footerLegendVisible &&
           globalStateSnap.results.List.length > 0 &&
           renderPagination()}
         <div
-          className={`scan-results-found ${globalStateSnap.results.List.length > 0 ? 'changeable' : globalStateSnap.results.Count === 0 ? 'zero' : ''}`}
+          className={`scan-results-found ${
+            globalStateSnap.results.List.length > 0
+              ? 'changeable'
+              : globalStateSnap.results.Count === 0
+              ? 'zero'
+              : ''
+          }`}
         >
           {Trans('FOUND', 'Found')}
           <b>{globalStateSnap.results.Count}</b>
         </div>
-        {globalStateSnap.results.List.length > 1 ? (
+        {globalStateSnap.results.List.length > 0 ? (
           <div className="scan-results-action">
-            <DialogButton className="btn-change-all" onClick={handleChangeAllValues}>
-              {Trans('ACTION_CHANGE_ALL_VALUES', 'Change all')}
+            <DialogButton className="btn-lock-value" onClick={handleToggleFreezeAll}>
+              {frozenIndices.length > 0 ? Trans('ACTION_UNFREEZE', 'Unlock') : Trans('ACTION_FREEZE', 'Lock')}
             </DialogButton>
+            {globalStateSnap.results.List.length > 1 && (
+              <DialogButton className="btn-change-all" onClick={handleChangeAllValues}>
+                {Trans('ACTION_CHANGE_ALL_VALUES', 'Change all')}
+              </DialogButton>
+            )}
           </div>
         ) : (
           globalStateSnap.results.Time && (
@@ -197,7 +259,6 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
           )
         )}
       </div>
-
       {globalStateSnap.results.List.length > 0 && (
         <PanelSectionRow>
           <DigitRoller
@@ -218,13 +279,14 @@ const ScanResults = (props: ScanResultsProps): JSX.Element => {
           />
         </PanelSectionRow>
       )}
-
       <AddressList
         data={globalStateSnap.results.List}
         page={globalStateSnap.results_page}
         maxPage={globalStateSnap.results_max_page}
         setPage={$globalState.setResultsCurrentPage}
         onSelectItem={handleChangeItemValue}
+        frozenIndices={frozenIndices}
+        onToggleFreezeItem={handleToggleFreezeItem}
         previewView={globalStateSnap.changeValue}
         onRefresh={handleRefreshValues}
         isFullscreen={!globalStateSnap.footerLegendVisible}

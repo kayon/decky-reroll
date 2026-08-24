@@ -1,4 +1,6 @@
 {
+  "ACTION_FREEZE": "固定",
+  "ACTION_UNFREEZE": "固定解除",
   "ACTION_INCREASE": "増やす",
   "ACTION_DECREASE": "減らす",
   "ACTION_MOVE": "移動",

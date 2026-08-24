@@ -20,6 +20,9 @@ const NextScan = callable<[value: string], Results | null>('next_scan')
 const UndoScan = callable<[], Results | null>('undo_scan')
 const ChangeValues = callable<[value: string, indexes: number[]], Results | null>('change_values')
 const RefreshValues = callable<[], Results | null>('refresh_values')
+const ToggleFreeze = callable<[index: number, value: string, freeze: boolean], { success: boolean, frozen: boolean }>('toggle_freeze')
+const ClearFrozen = callable<[], { success: boolean }>('clear_frozen')
+const GetFrozenIndices = callable<[], number[]>('get_frozen_indices')
 
 export default {
   GetSetting,
@@ -36,4 +39,7 @@ export default {
   UndoScan,
   ChangeValues,
   RefreshValues,
+  ToggleFreeze,
+  ClearFrozen,
+  GetFrozenIndices,
 }

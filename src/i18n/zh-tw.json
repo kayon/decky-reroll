@@ -1,4 +1,6 @@
 {
+  "ACTION_FREEZE": "鎖定",
+  "ACTION_UNFREEZE": "解鎖",
   "ACTION_INCREASE": "增加",
   "ACTION_DECREASE": "減少",
   "ACTION_MOVE": "移動",
