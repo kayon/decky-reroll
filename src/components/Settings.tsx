@@ -11,6 +11,7 @@ import {
   PanelSection,
   PanelSectionRow,
   SliderField,
+  ToggleField,
 } from '@decky/ui'
 import {
   InternalRouting,
@@ -144,6 +145,18 @@ const Settings = (): JSX.Element => {
               height: '30px',
               flexBasis: '30px',
             }}
+          />
+        </PanelSectionRow>
+
+        <PanelSectionRow>
+          <ToggleField
+            label={Trans('EMULATOR_MODE', 'Emulator games')}
+            description={Trans(
+              'EMULATOR_MODE_DESC',
+              'Scan all regions (including read-only) and shared memory. For emulator games (Yuzu, Ryujinx, ...).'
+            )}
+            checked={snap.EmulatorMode}
+            onChange={(value) => $settings.setEmulatorMode(value)}
           />
         </PanelSectionRow>
 

@@ -9,12 +9,14 @@ export interface Settings {
   ResultsThreshold: number
   ScanOption: ScanOptions
   HasAcceptedDisclaimer: boolean
+  EmulatorMode: boolean
 }
 
 const initialSettings = {
   ResultsThreshold: MIN_RESULTS_THRESHOLD,
   ScanOption: ScanOptions.FloatUnrounded,
   HasAcceptedDisclaimer: false,
+  EmulatorMode: false,
 }
 
 export const settings = proxy<Settings>({...initialSettings})
@@ -36,7 +38,16 @@ export const $settings = {
       false
     )) as boolean
 
+    settings.EmulatorMode = (await Backend.GetSetting('EmulatorMode', false)) as boolean
+
     await Backend.SetRenderResultsThreshold(settings.ResultsThreshold)
+  },
+
+  async setEmulatorMode(value: boolean) {
+    if (value !== settings.EmulatorMode) {
+      settings.EmulatorMode = value
+      await Backend.SetSetting('EmulatorMode', settings.EmulatorMode)
+    }
   },
 
   async setResultsThreshold(value: number) {

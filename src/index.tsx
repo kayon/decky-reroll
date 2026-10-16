@@ -101,7 +101,8 @@ function Content() {
       globalState.game.appid,
       globalState.scanValue,
       globalState.scanType,
-      settings.ScanOption
+      settings.ScanOption,
+      settings.EmulatorMode
     )
     globalState.loading = false
     $globalState.setResults(results)

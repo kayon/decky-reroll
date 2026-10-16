@@ -13,7 +13,7 @@ const GetGameProcesses = callable<[appid: number], Process[] | null>('get_game_p
 const SelectGameProcess = callable<[appid: number, pid: number], Process | null>('select_game_process')
 const AutoSelectGameProcess = callable<[appid: number], Process | null>('auto_select_game_process')
 const FirstScan = callable<
-  [appid: number, value: string, type: ValueTypes, option: ScanOptions],
+  [appid: number, value: string, type: ValueTypes, option: ScanOptions, emulator: boolean],
   Results | null
 >('first_scan')
 const NextScan = callable<[value: string], Results | null>('next_scan')

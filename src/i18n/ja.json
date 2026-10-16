@@ -18,6 +18,8 @@
   "UNDO_SCAN": "元に戻す",
   "RESET_SCAN": "リセット",
   "FOUND": "検索結果",
+  "EMULATOR_MODE": "エミュレーター",
+  "EMULATOR_MODE_DESC": "すべてのメモリ領域(読み取り専用を含む)と共有メモリをスキャンします。エミュレーターゲーム(Yuzu、Ryujinx など)向け。",
 
   "SETTINGS": "設定",
   "RESET_DEFAULT": "初期設定に戻す",

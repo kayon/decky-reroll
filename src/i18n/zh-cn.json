@@ -18,6 +18,8 @@
   "UNDO_SCAN": "撤销",
   "RESET_SCAN": "重置",
   "FOUND": "找到",
+  "EMULATOR_MODE": "模拟器游戏",
+  "EMULATOR_MODE_DESC": "扫描全部内存区域(含只读)及共享内存。用于模拟器游戏(Yuzu、Ryujinx 等)。",
 
   "SETTINGS": "设置",
   "RESET_DEFAULT": "恢复默认设置",

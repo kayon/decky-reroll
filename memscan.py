@@ -26,7 +26,7 @@ lib.SelectGameProcess.restype = ctypes.c_void_p
 lib.AutoSelectGameProcess.argtypes = [ctypes.c_int64]
 lib.AutoSelectGameProcess.restype = ctypes.c_void_p
 
-lib.FirstScan.argtypes = [ctypes.c_int64, ctypes.c_char_p, ctypes.c_int, ctypes.c_int]
+lib.FirstScan.argtypes = [ctypes.c_int64, ctypes.c_char_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
 lib.FirstScan.restype = ctypes.c_void_p
 
 lib.NextScan.argtypes = [ctypes.c_char_p]
@@ -85,8 +85,12 @@ class Memscan:
         return Memscan.__call(lib.AutoSelectGameProcess, appid)
 
     @staticmethod
-    def first_scan(appid: int, value: str, value_type: int, option: int):
-        return Memscan.__call(lib.FirstScan, appid, value.encode('utf-8'), value_type, option)
+    def first_scan(appid: int, value: str, value_type: int, option: int, emulator: bool = False):
+        # emulator=True scans every readable region (incl. read-only) and keeps
+        # shared mappings, required for emulators (Yuzu, Ryujinx, ...).
+        return Memscan.__call(
+            lib.FirstScan, appid, value.encode('utf-8'), value_type, option, 1 if emulator else 0
+        )
 
     @staticmethod
     def next_scan(value: str):
