@@ -73,9 +73,9 @@ class Plugin:
     async def auto_select_game_process(self, appid: int):
         return Memscan.auto_select_game_process(appid)
 
-    async def first_scan(self, appid: int, value: str, value_type: int, option: int):
+    async def first_scan(self, appid: int, value: str, value_type: int, option: int, emulator: bool = False):
         self.frozen_values.clear()
-        return Memscan.first_scan(appid, value, value_type, option)
+        return Memscan.first_scan(appid, value, value_type, option, emulator)
 
     async def next_scan(self, value: str):
         self.frozen_values.clear()
