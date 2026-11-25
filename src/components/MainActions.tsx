@@ -91,6 +91,7 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
         <DialogButton
           className="btn-action"
           onClick={props.onFirstScan}
+          onOKActionDescription={Trans('FIRST_SCAN', 'First Scan')}
           disabled={props.disabled || !props.firstScannable}
           focusable={!props.disabled && props.firstScannable}
         >
@@ -100,6 +101,7 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
         <DialogButton
           className="btn-action"
           onClick={props.onNextScan}
+          onOKActionDescription={Trans('NEXT_SCAN', 'Next Scan')}
           disabled={props.disabled || !props.nextScannable}
           focusable={!props.disabled && props.nextScannable}
         >
@@ -110,6 +112,7 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
           <DialogButton
             className="btn-action"
             onClick={props.onUndoScan}
+            onOKActionDescription={Trans('UNDO_SCAN', 'Undo')}
             disabled={props.disabled}
             focusable={!props.disabled}
           >
@@ -120,6 +123,7 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
         <DialogButton
           className="btn-action"
           onClick={props.onResetScan}
+          onOKActionDescription={Trans('RESET_SCAN', 'Reset')}
           disabled={props.disabled || !props.resettable}
           focusable={!props.disabled && props.resettable}
         >
@@ -127,7 +131,11 @@ const MainActions = (props: MainActionsProps): JSX.Element => {
         </DialogButton>
 
         {!props.resettable && (
-          <DialogButton className="btn-action setting" onClick={handleOpenSetting}>
+          <DialogButton
+            className="btn-action setting"
+            onClick={handleOpenSetting}
+            onOKActionDescription={Trans('ACTION_SELECT', 'Select')}
+          >
             <FaCog />
           </DialogButton>
         )}

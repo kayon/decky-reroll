@@ -5,8 +5,8 @@ import SharedDpad from '@/components/SharedDpad'
 import SharedButtons from '@/components/SharedButtons'
 import { RiArrowDropRightLine, RiArrowDropLeftLine, RiLockFill } from 'react-icons/ri'
 import { ActionSoundEffects, PlaySound } from '@/lib/utils'
-import { Snapshot } from 'valtio'
-import { NUMBER_RESULTS_PRE_PAGE } from '@/stores/global'
+import { Snapshot, useSnapshot } from 'valtio'
+import { globalState, NUMBER_RESULTS_PRE_PAGE } from '@/stores/global'
 
 interface AddressListProps {
   data: Snapshot<string[][]>
@@ -20,6 +20,10 @@ interface AddressListProps {
   previewView: string
   isFullscreen?: boolean
 }
+
+// the bar of hints at the bottom is one line: small glyphs, one label each
+const GUIDE_GLYPH_SIZE = 14
+const GUIDE_BAR_HEIGHT = 20
 
 interface LocalGamepadEventDetail {
   button: number
@@ -37,11 +41,14 @@ const AddressItem = memo(
     onToggleFreeze,
     previewNumValue,
     isAutoFocus,
+    hasPages,
   }: {
     item: Readonly<string[]>
     index: number
     isActive: boolean
     isFrozen: boolean
+    // left/right change the page
+    hasPages: boolean
     onFocus: () => void
     onBlur: () => void
     onSelect: () => void
@@ -64,9 +71,15 @@ const AddressItem = memo(
         actionDescriptionMap={{
           [GamepadButton.DIR_UP]: Trans('ACTION_MOVE', 'Move'),
           [GamepadButton.DIR_DOWN]: Trans('ACTION_MOVE', 'Move'),
-          [GamepadButton.DIR_LEFT]: Trans('ACTION_PREV_PAGE', 'Prev'),
-          [GamepadButton.DIR_RIGHT]: Trans('ACTION_NEXT_PAGE', 'Next'),
+          // the same label on both: Steam shows them as one entry, like Move for up/down
+          ...(hasPages
+            ? {
+                [GamepadButton.DIR_LEFT]: Trans('ACTION_PAGE', 'Page'),
+                [GamepadButton.DIR_RIGHT]: Trans('ACTION_PAGE', 'Page'),
+              }
+            : {}),
           [GamepadButton.OK]: Trans('ACTION_CHANGE_VALUE', 'Change'),
+          [GamepadButton.CANCEL]: Trans('ACTION_BACK', 'Back'),
           [GamepadButton.SECONDARY]: isFrozen
             ? Trans('ACTION_UNFREEZE', 'Unfreeze')
             : Trans('ACTION_FREEZE', 'Freeze'),
@@ -97,6 +110,7 @@ const AddressItem = memo(
       prev.item[1] === next.item[1] &&
       prev.isActive === next.isActive &&
       prev.isFrozen === next.isFrozen &&
+      prev.hasPages === next.hasPages &&
       prev.previewNumValue === next.previewNumValue
     )
   }
@@ -105,6 +119,7 @@ const AddressItem = memo(
 AddressItem.displayName = 'AddressItem'
 
 const AddressList = (props: AddressListProps): JSX.Element => {
+  const globalStateSnap = useSnapshot(globalState)
   const previewNumValue = Number(props.previewView)
   const [activeIndex, setActiveIndex] = useState<number>(-1)
   const [isHover, setIsHover] = useState(false)
@@ -171,25 +186,31 @@ const AddressList = (props: AddressListProps): JSX.Element => {
   const renderGuide = () => {
     return (
       <div className="address-list-guide">
-        <div className="pagination">
-          <div>
-            {props.page}/{props.maxPage}
+        {props.maxPage > 1 && (
+          <div className="pagination">
+            <div>
+              {props.page}/{props.maxPage}
+            </div>
           </div>
-        </div>
+        )}
         <div className="guide">
           {props.maxPage > 1 && (
-            <SharedDpad left={true} right={true}>
-              <div>{Trans('ACTION_PREV_PAGE', 'Prev')}</div>
-              <div>{Trans('ACTION_NEXT_PAGE', 'Next')}</div>
+            <SharedDpad left={true} right={true} size={GUIDE_GLYPH_SIZE}>
+              <div>{Trans('ACTION_PAGE', 'Page')}</div>
             </SharedDpad>
           )}
-          <SharedDpad up={true} down={true}>
-            <div>{Trans('ACTION_MOVE', 'Move')}</div>
-          </SharedDpad>
-          <SharedButtons a={true} x={true}>
+          <SharedButtons a={true} size={GUIDE_GLYPH_SIZE}>
             <div>{Trans('ACTION_CHANGE_VALUE', 'Change')}</div>
+          </SharedButtons>
+          <SharedButtons x={true} size={GUIDE_GLYPH_SIZE}>
             <div>{Trans('ACTION_FREEZE', 'Freeze')}</div>
           </SharedButtons>
+          {globalStateSnap.scanShortcut && (
+            <div className="scan-shortcut">
+              <b>R2</b>
+              {Trans('ACTION_SCAN', 'Scan')}
+            </div>
+          )}
         </div>
       </div>
     )
@@ -214,13 +235,14 @@ const AddressList = (props: AddressListProps): JSX.Element => {
           
           > .address-list-guide {
             display: none;
-            gap: 10px;
+            gap: 8px;
             position: fixed;
-            height: 26px;
+            height: ${GUIDE_BAR_HEIGHT}px;
             width: 292px;
             right: 0;
             bottom: 0;
-            padding: 0 4px;
+            padding: 0 6px;
+            white-space: nowrap;
             background-color: #32373d;
             color: white;
             z-index: 5;
@@ -230,23 +252,38 @@ const AddressList = (props: AddressListProps): JSX.Element => {
               display: flex;
               align-items: center;
               > div {
-                height: 20px;
-                width: 32px;
+                height: 16px;
+                width: 30px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 border-radius: 2px;
                 color: #23262e;
                 background-color: white;
-                font-size: 12px;
+                font-size: 11px;
               }
             }
             > .guide {
               flex: 1;
               display: flex;
               align-items: center;
-              justify-content: center;
-              gap: 16px;
+              justify-content: space-evenly;
+              gap: 6px;
+              font-size: 10px;
+              line-height: 12px;
+
+              > .scan-shortcut {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                > b {
+                  font-weight: normal;
+                  background-color: white;
+                  color: #23262e;
+                  border-radius: 2px;
+                  padding: 0 3px;
+                }
+              }
             }
           }
           
@@ -360,6 +397,7 @@ const AddressList = (props: AddressListProps): JSX.Element => {
                 index={absoluteIndex + 1}
                 isActive={ActiveIndex === index}
                 isFrozen={isFrozen}
+                hasPages={props.maxPage > 1}
                 previewNumValue={previewNumValue}
                 onFocus={() => setActiveIndex(index)}
                 onBlur={() => setActiveIndex(-1)}
@@ -370,10 +408,11 @@ const AddressList = (props: AddressListProps): JSX.Element => {
             )
           })}
 
+          {/* the bar of hints is fixed over the bottom of the screen: leave room for it
+              so that the last line can be scrolled above it */}
           <div
             style={{
-              height: '48px',
-              marginBottom: '-48px',
+              height: props.isFullscreen && hasData ? `${GUIDE_BAR_HEIGHT + 6}px` : 0,
               pointerEvents: 'none',
               flexShrink: 0,
             }}
