@@ -64,7 +64,9 @@ interface GameProcessProps {
   game?: AppGame
   process?: Snapshot<Process> | null
   // 当在游戏中显示 QuickAccess 时视为全屏
+  // treated as fullscreen when QuickAccess shows over the game
   // 通过 !footerLegendVisible 判断
+  // decided by !footerLegendVisible
   isFullscreen: boolean
 }
 
@@ -268,7 +270,7 @@ const GameProcess = (props: GameProcessProps): JSX.Element => {
           {Trans('WRONG_PROCESS', 'Wrong process?')}
         </div>
         <DialogButton
-          onClick={() => showQRCodeModal('https://github.com/kayon/decky-reroll/issues')}
+          onClick={() => showQRCodeModal('https://github.com/naparuba/decky-reroll/issues')}
           onCancelButton={() => $globalState.navigation(InternalRouting.Main)}
           style={{
             paddingBlock: 0,

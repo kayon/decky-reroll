@@ -1,5 +1,10 @@
 import { AppGame, RollerConfig, ValueTypes } from '@/classes'
+import { candidateTypes } from '@/lib/candidates'
 import { SteamAppOverview } from '@decky/ui/dist/globals/steam-client/App'
+
+// The roller of a value that is searched in every type that can hold it
+export const AUTO_ROLLER = 'auto' as const
+export type RollerType = ValueTypes | typeof AUTO_ROLLER
 
 export const Sounds = [
   'bumper_end.wav',
@@ -61,44 +66,64 @@ export const PlaySound = (sound: Sound) => {
   }
 }
 
-const ROLLER_CONFIGS: Record<ValueTypes, RollerConfig> = {
+const ROLLER_CONFIGS: Record<RollerType, RollerConfig> = {
+  [AUTO_ROLLER]: {
+    length: 20, // sign + 19 digits (or 18 digits and a point)
+    charset: '0123456789.'.split(''),
+    hasDecimal: true,
+    signed: true,
+  },
+  // every roller starts with a sign slot
   [ValueTypes.Int8]: {
-    length: 3, // 0-255
+    length: 4, // sign + 3 digits: -128..255
     charset: '0123456789'.split(''),
     hasDecimal: false,
+    signed: true,
   },
   [ValueTypes.Int16]: {
-    length: 5, // 0-65535
+    length: 6, // sign + 5 digits: -32768..65535
     charset: '0123456789'.split(''),
     hasDecimal: false,
+    signed: true,
   },
   [ValueTypes.Int32]: {
-    length: 10, // 0-4294967295
+    length: 11, // sign + 10 digits: -2^31..2^32-1
     charset: '0123456789'.split(''),
     hasDecimal: false,
+    signed: true,
   },
   [ValueTypes.Int64]: {
-    length: 19, // 0-1.84e19
+    length: 20, // sign + 19 digits: -2^63..1.84e19
     charset: '0123456789'.split(''),
     hasDecimal: false,
+    signed: true,
   },
   [ValueTypes.Float32]: {
-    length: 12,
+    length: 13, // sign + 12
     charset: '0123456789.'.split(''),
     hasDecimal: true,
+    signed: true,
   },
   [ValueTypes.Float64]: {
-    length: 20,
+    length: 21, // sign + 20
     charset: '0123456789.'.split(''),
     hasDecimal: true,
+    signed: true,
   },
 }
 
-export const DigitRollerMetadata = (type: ValueTypes, initialValue: string) => {
+export const SIGN_CHARSET = ['+', '-']
+
+export const DigitRollerMetadata = (type: RollerType, initialValue: string) => {
   const config = ROLLER_CONFIGS[type]
-  const paddedValue = initialValue.padStart(config.length, '0')
-  const finalString = paddedValue.slice(-config.length)
-  const initialDigits = finalString.split('')
+  let sign: string[] = []
+  let value = initialValue
+  if (config.signed) {
+    sign = [value.startsWith('-') ? '-' : '+']
+    value = value.replace(/^[+-]/, '')
+  }
+  const digitCount = config.length - sign.length
+  const initialDigits = [...sign, ...value.padStart(digitCount, '0').slice(-digitCount).split('')]
   return {
     ...config,
     initialDigits,
@@ -106,7 +131,9 @@ export const DigitRollerMetadata = (type: ValueTypes, initialValue: string) => {
 }
 
 export const ValueTypeOptions = Object.keys(ValueTypes)
-  .filter(key => isNaN(Number(key))) // 过滤掉反向映射产生的数字 Key
+  .filter(key => isNaN(Number(key)))
+  // 过滤掉反向映射产生的数字 Key
+  // filters out the numeric keys from the reverse enum mapping
   .map(key => ({
     label: key,
     value: ValueTypes[key as keyof typeof ValueTypes],
@@ -135,28 +162,32 @@ export const MaxUInt16 = 2n ** 16n - 1n // 65535n
 export const MaxUInt32 = 2n ** 32n - 1n // 4294967295n
 export const MaxUInt64 = 2n ** 64n - 1n // 18446744073709551615n
 
-export const IsValueValid = (inputValue: string, type: ValueTypes): boolean => {
+export const IsValueValid = (inputValue: string, type: RollerType): boolean => {
+  if (type === AUTO_ROLLER) {
+    // valid when some type can hold it (zero is checked by the scan itself)
+    return candidateTypes(inputValue, true).length > 0
+  }
   if (type === ValueTypes.Float32 || type === ValueTypes.Float64) {
     const num = parseFloat(inputValue)
-    if (isNaN(num) || !isFinite(num) || num < 0) {
+    if (isNaN(num) || !isFinite(num)) {
       return false
     }
     if (type === ValueTypes.Float32) {
-      return num <= MaxFloat32
+      return Math.abs(num) <= MaxFloat32
     }
-    return num <= MaxFloat64
+    return Math.abs(num) <= MaxFloat64
   }
   try {
     const num = BigInt(inputValue)
     switch (type) {
       case ValueTypes.Int8:
-        return num <= MaxUInt8
+        return num >= -(2n ** 7n) && num <= MaxUInt8
       case ValueTypes.Int16:
-        return num <= MaxUInt16
+        return num >= -(2n ** 15n) && num <= MaxUInt16
       case ValueTypes.Int32:
-        return num <= MaxUInt32
+        return num >= -(2n ** 31n) && num <= MaxUInt32
       case ValueTypes.Int64: {
-        return num <= MaxUInt64
+        return num >= -(2n ** 63n) && num <= MaxUInt64
       }
     }
   } catch {

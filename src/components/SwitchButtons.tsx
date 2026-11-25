@@ -1,6 +1,6 @@
 import React, { JSX, useState } from 'react'
 import { DialogButton, Focusable } from '@decky/ui'
-import { NavEntryPositionPreferences } from '@decky/ui/src/components/FooterLegend'
+import { NavEntryPositionPreferences } from '@decky/ui'
 
 interface SwitchButtonOption<T> {
   label: React.ReactNode

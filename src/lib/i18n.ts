@@ -1,4 +1,5 @@
 import zhCn from '@/i18n/zh-cn.json'
+import zhTw from '@/i18n/zh-tw.json'
 import ja from '@/i18n/ja.json'
 
 type StringKey = keyof typeof zhCn
@@ -6,6 +7,7 @@ type LocaleData = Record<StringKey, string>
 
 const strings: Record<string, LocaleData> = {
   'zh-cn': zhCn as LocaleData,
+  'zh-tw': zhTw as LocaleData,
   ja: ja as LocaleData,
 }
 

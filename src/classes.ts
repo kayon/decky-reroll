@@ -36,6 +36,8 @@ export interface RollerConfig {
   length: number
   charset: string[]
   hasDecimal: boolean
+  // the first slot is a sign ('+' or '-') instead of a digit
+  signed?: boolean
 }
 
 export interface AppGame {
@@ -55,3 +57,24 @@ export enum ScanOptions {
 
 export const MIN_RESULTS_THRESHOLD = 10
 export const MAX_RESULTS_THRESHOLD = 100
+
+// Multi-type scan: the value is searched in every type that can hold it
+
+// - ok: results that can be refined
+export type TypeStatus = 'ok' | 'parked' | 'truncated' | 'empty' | 'dropped'
+
+export interface TypeResults {
+  Type: ValueTypes
+  Name: string
+  Count: number
+  Status: TypeStatus
+  // addresses and values, only for a type with status ok and few results
+  List: string[][] | null
+}
+
+export interface MultiResults {
+  Types: TypeResults[]
+  Round: number
+  Time: string
+  CanUndo: boolean
+}

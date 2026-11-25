@@ -12,11 +12,25 @@ I have been a long-time user of [Memory Deck](https://github.com/CameronRedmore/
 However, as my needs grew, I found the scanning speed and UI flow could be further optimized. **Reroll** was created to bridge that gap, focusing on performance and a streamlined user experience.
 
 ## Key Features
+- 🔎 **Every type at once**: type a value, and it is searched as Int8, Int16, Int32, Int64, Float32 and Float64 in a single pass over the game memory, for every type that can hold it. The memory is read only once, so searching six types is far cheaper than six separate scans.
 - 🚀 **Ultra-Fast Scanning**: Millisecond-level scanning that delivers results before you can even blink, powered by [memscan](https://github.com/kayon/memscan), a high-performance engine custom-built for the Steam Deck.
 - 🎯 **Smart Process Identification**: Automatically detects the currently active game—eliminating the need to scroll through messy process lists or risk selecting the wrong target.
+- 🗂️ **Three searches side by side**: look for your ammo, your health and something else at the same time, switched with `L1` / `R1` without reloading anything.
+- ➖ **Negative values** can be searched and written, with the range of each type checked.
+- 🔒 **Value freezing** and **🕹️ emulator games mode**, from pull requests #6 and #9.
+- 📉 **Gradient**: write a different value on each result (87, 86, 85...) to find out which address does what in the game.
 - 📱 **Compact Interface**: A streamlined, single-pane UI optimized for handheld play; focused on speed and efficiency without the need for scrolling.
 
 ## What's New
+### Proposed in this PR (backend core: multi-type search, see the companion memscan PR)
+* **Multi-type search**: the value is searched in every type that can hold it, in one pass. Types are shown as chips; *Keep only* drops the others once you know which type holds the value.
+* **Three searches side by side**, switched with `L1` / `R1` without reloading anything. Each one is an independent search in the engine; locks work on all of them at once.
+* **Gradient** (`L4`): a different value on each result, to find which address does what.
+* **Negative values when writing**, with the range of each type checked.
+* **Messages for the types that cannot be listed**: too many results to list (change the value in the game, then scan again) and too many results to keep.
+* **Controller shortcuts**: `R2` starts a scan, `X` / `L2` lock all and change all, `Y` keeps one type. The legend stays on one line.
+* Built on top of #6 (value locking) and #9 (emulator mode), already open on this repo.
+
 ### v0.2.0 (backend core: v0.3.0)
 This update introduces a major overhaul of the scanning engine, delivering significant performance gains and new features:
 * **NextScan Optimization**: Refactored the scanning algorithm. For datasets exceeding 10 million results, `NextScan` latency has been reduced from seconds to milliseconds.
